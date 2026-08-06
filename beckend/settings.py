@@ -24,7 +24,9 @@ if not SECRET_KEY:
     if DEBUG or 'collectstatic' in sys.argv:
         SECRET_KEY = 'dev-secret-key-do-not-use-in-production'
     else:
-        raise RuntimeError("DJANGO_SECRET_KEY environment variable is required!")
+        import secrets
+        SECRET_KEY = secrets.token_urlsafe(50)
+        print('WARNING: DJANGO_SECRET_KEY not set. Using a random key (sessions will reset on restart). Set it in Railway variables!', file=sys.stderr)
 
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'tezsotmarket-production.up.railway.app,.railway.app,localhost').split(',')
 
