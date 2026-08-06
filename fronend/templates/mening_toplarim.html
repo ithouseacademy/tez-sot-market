@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="uz">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Top mahsulotlarim - Tez Sot</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        body { font-family:'Inter',sans-serif; background:#f8fafc; color:#0f172a; padding-bottom:72px; }
+        .card { background:white; border-radius:16px; box-shadow:0 1px 3px rgba(0,0,0,0.06); overflow:hidden; transition:box-shadow .2s; }
+        .card:hover { box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+        .stat-card { background:white; border-radius:16px; padding:20px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+        .stat-card .num { font-size:28px; font-weight:800; }
+        .badge-aktiv { background:#d1fae5; color:#065f46; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+        .badge-kutilmoqda { background:#fef3c7; color:#92400e; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+        .badge-tugadi { background:#fee2e2; color:#991b1b; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+        .countdown { font-size:13px; font-weight:600; color:#d97706; }
+    </style>
+</head>
+<body>
+    <div style="max-width:900px;margin:0 auto;padding:20px 16px 100px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+            <a href="{% url 'mening_elonlarim' %}" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);color:#0f172a;font-size:18px;text-decoration:none;"><i class="fas fa-arrow-left"></i></a>
+            <div>
+                <h1 style="font-size:22px;font-weight:700;"><i class="fas fa-fire" style="color:#f59e0b;"></i> Top mahsulotlarim</h1>
+                <p style="font-size:13px;color:#64748b;">Reklama va top mahsulotlaringizni boshqaring</p>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div style="margin-bottom:16px;">
+            {% for message in messages %}
+            <div style="padding:12px 16px;border-radius:12px;margin-bottom:8px;font-size:14px;{% if message.tags == 'error' %}background:#fee2e2;color:#991b1b;{% else %}background:#d1fae5;color:#065f46;{% endif %}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;">
+            <div class="stat-card"><div class="num" style="color:#10b981;">{{ active_count }}</div><div style="font-size:12px;color:#64748b;margin-top:4px;">Aktiv</div></div>
+            <div class="stat-card"><div class="num" style="color:#f59e0b;">{{ pending_count }}</div><div style="font-size:12px;color:#64748b;margin-top:4px;">Kutilmoqda</div></div>
+            <div class="stat-card"><div class="num" style="color:#ef4444;">{{ expired_count }}</div><div style="font-size:12px;color:#64748b;margin-top:4px;">Tugagan</div></div>
+        </div>
+
+        <a href="{% url 'select_product_for_featured' %}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:white;padding:14px;border-radius:14px;font-weight:600;font-size:15px;text-decoration:none;margin-bottom:20px;">
+            <i class="fas fa-plus"></i> Yangi top mahsulot qo'shish
+        </a>
+
+        {% if purchases %}
+            <div style="display:flex;flex-direction:column;gap:12px;">
+            {% for p in purchases %}
+                <div class="card" style="padding:16px;display:flex;gap:14px;align-items:center;">
+                    <div style="width:56px;height:56px;border-radius:12px;overflow:hidden;flex-shrink:0;background:#f1f5f9;">
+                        {% if p.mahsulot.asosiyimg %}
+                        <img src="{{ p.mahsulot.asosiyimg.url }}" style="width:100%;height:100%;object-fit:cover;">
+                        {% else %}
+                        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:20px;"><i class="fas fa-image"></i></div>
+                        {% endif %}
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.mahsulot.name }}</div>
+                        <div style="font-size:12px;color:#64748b;margin-top:2px;">{{ p.days }} kun &middot; {{ p.price|floatformat:0 }} so'm</div>
+                        <div style="margin-top:6px;">
+                            {% if p.status == 'aktiv' %}
+                                <span class="badge-aktiv">Aktiv</span>
+                                {% if p.expires_at %}
+                                <span class="countdown" data-expires="{{ p.expires_at|date:'c' }}"><i class="far fa-clock"></i> <span class="countdown-timer"></span></span>
+                                {% endif %}
+                            {% elif p.status == 'kutilmoqda' %}
+                                <span class="badge-kutilmoqda">Kutilmoqda</span>
+                            {% elif p.status == 'tugadi' %}
+                                <span class="badge-tugadi">Tugagan</span>
+                                <a href="{% url 'buy_featured' p.mahsulot.id %}" style="display:inline-flex;align-items:center;gap:4px;margin-left:8px;font-size:12px;color:#d97706;font-weight:600;text-decoration:none;"><i class="fas fa-redo"></i> Qayta top qilish</a>
+                            {% elif p.status == 'bekor_qilindi' %}
+                                <span style="background:#f1f5f9;color:#64748b;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">Bekor qilingan</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+                        <a href="{% url 'mahsulot_detail' p.mahsulot.id %}" style="padding:8px 12px;background:#f1f5f9;border-radius:10px;font-size:12px;color:#0f172a;text-decoration:none;text-align:center;font-weight:500;"><i class="fas fa-eye"></i></a>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align:center;padding:60px 20px;background:white;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                <div style="font-size:48px;color:#f59e0b;margin-bottom:16px;"><i class="fas fa-fire"></i></div>
+                <h3 style="font-size:18px;font-weight:600;margin-bottom:8px;">Hali top mahsulotlaringiz yo'q</h3>
+                <p style="font-size:14px;color:#64748b;max-width:300px;margin:0 auto 20px;">Mahsulotingizni top qilib, ko'proq xaridorlarni jalb qiling!</p>
+                <a href="{% url 'select_product_for_featured' %}" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:white;padding:12px 24px;border-radius:12px;font-weight:600;font-size:15px;text-decoration:none;">Birinchi top mahsulotni qo'shish</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function updateCountdowns() {
+            document.querySelectorAll('[data-expires]').forEach(el => {
+                const timer = el.querySelector('.countdown-timer');
+                if (!timer) return;
+                const expires = new Date(el.dataset.expires).getTime();
+                const now = Date.now();
+                const diff = expires - now;
+                if (diff <= 0) { timer.textContent = 'Muddati tugagan'; return; }
+                const days = Math.floor(diff / 86400000);
+                const hours = Math.floor((diff % 86400000) / 3600000);
+                const mins = Math.floor((diff % 3600000) / 60000);
+                if (days > 0) timer.textContent = days + ' kun ' + hours + ' soat';
+                else if (hours > 0) timer.textContent = hours + ' soat ' + mins + ' min';
+                else timer.textContent = mins + ' minut';
+            });
+        }
+        updateCountdowns();
+        setInterval(updateCountdowns, 10000);
+
+        setInterval(function() {
+            fetch('/api/featured/check-expiry/')
+                .then(r => r.json())
+                .then(d => {
+                    if (d.notifications && d.notifications.length) {
+                        d.notifications.forEach(n => {
+                            if (Notification.permission === 'granted') {
+                                new Notification('Top mahsulot', { body: n.message, icon: '/static/img/iconlogo.png' });
+                            }
+                        });
+                    }
+                    if (d.expired_ids && d.expired_ids.length) {
+                        location.reload();
+                    }
+                })
+                .catch(() => {});
+        }, 15000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="uz">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reklama - Tez Sot Market | Mahsulotingizni targ'ib qiling</title>
+    <meta name="description" content="Tez Sot Market'da reklama va premium xizmatlar - mahsulotingizni TOP'ga chiqaring, banner joylashtiring.">
+    <meta name="keywords" content="reklama, tez sot, tez sot market, premium, banner, TOP, targ'ib">
+    <link rel="canonical" href="https://tezsotmarket-production.up.railway.app/reklama/">
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:#ffffff; color:#0f172a; }
+        .card { background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; overflow:hidden; }
+        .card-body { padding:20px; }
+        .price-card { background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:16px 12px; text-align:center; }
+        .price-card.popular { border-color:#0f172a; background:#f8fafc; }
+        .price-card .amount { font-size:20px; font-weight:800; color:#0f172a; }
+        .price-card .label { font-size:12px; color:#64748b; margin-top:2px; }
+        .price-card .badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:9px; font-weight:700; margin-top:6px; background:#0f172a; color:white; }
+        .price-card .badge.green { background:#059669; }
+        .price-card .badge.amber { background:#d97706; }
+        .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 24px; border-radius:12px; font-weight:600; font-size:14px; text-decoration:none; border:none; cursor:pointer; width:100%; transition:all .2s; }
+        .btn:active { transform:scale(0.97); }
+        .btn-dark { background:#0f172a; color:white; }
+        .btn-dark:hover { background:#1e293b; }
+        .btn-outline { background:white; color:#0f172a; border:1.5px solid #e2e8f0; }
+        .btn-outline:hover { border-color:#0f172a; }
+        .service-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; color:white; flex-shrink:0; }
+        @media (max-width:480px) {
+            .price-grid { grid-template-columns:repeat(2,1fr); }
+        }
+    </style>
+</head>
+<body>
+    {% include 'nav.html' %}
+    <div style="max-width:640px;margin:0 auto;padding:24px 16px 80px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px;">
+            <a href="{% url 'mening_elonlarim' %}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:1px solid #e2e8f0;border-radius:10px;color:#0f172a;font-size:16px;text-decoration:none;"><i class="fas fa-arrow-left"></i></a>
+            <div>
+                <h1 style="font-size:22px;font-weight:700;">Reklama</h1>
+                <p style="font-size:13px;color:#64748b;">Mahsulotingizni minglab xaridorlarga yetkazing</p>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div style="margin-bottom:16px;">
+            {% for message in messages %}
+            <div style="padding:12px 16px;border-radius:12px;margin-bottom:8px;font-size:14px;{% if message.tags == 'error' %}background:#fee2e2;color:#991b1b;{% else %}background:#f0fdf4;color:#166534;{% endif %}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:32px;">
+            <div class="card">
+                <div style="padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;">
+                    <div class="service-icon" style="background:#0f172a;"><i class="fas fa-crown"></i></div>
+                    <h3 style="font-size:16px;font-weight:700;">Premium obuna</h3>
+                    <ul style="list-style:none;font-size:13px;color:#475569;width:100%;">
+                        <li style="padding:4px 0;display:flex;align-items:center;gap:6px;"><i class="fas fa-check" style="color:#059669;font-size:12px;"></i> 10+ ta e'lon</li>
+                        <li style="padding:4px 0;display:flex;align-items:center;gap:6px;"><i class="fas fa-check" style="color:#059669;font-size:12px;"></i> Premium badge</li>
+                        <li style="padding:4px 0;display:flex;align-items:center;gap:6px;"><i class="fas fa-check" style="color:#059669;font-size:12px;"></i> Birinchi o'rin</li>
+                    </ul>
+                    <a href="{% url 'buy_premium' %}" class="btn btn-dark" style="margin-top:auto;">Premium olish</a>
+                </div>
+            </div>
+            <div class="card">
+                <div style="padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;">
+                    <div class="service-icon" style="background:#2563eb;"><i class="fas fa-ad"></i></div>
+                    <h3 style="font-size:16px;font-weight:700;">Banner reklama</h3>
+                    <ul style="list-style:none;font-size:13px;color:#475569;width:100%;">
+                        <li style="padding:4px 0;display:flex;align-items:center;gap:6px;"><i class="fas fa-check" style="color:#059669;font-size:12px;"></i> Bosh sahifada</li>
+                        <li style="padding:4px 0;display:flex;align-items:center;gap:6px;"><i class="fas fa-check" style="color:#059669;font-size:12px;"></i> Mobil va desktop</li>
+                        <li style="padding:4px 0;display:flex;align-items:center;gap:6px;"><i class="fas fa-check" style="color:#059669;font-size:12px;"></i> <strong>{{ banner_price_per_day|floatformat:0 }} so'm/kun</strong></li>
+                    </ul>
+                    <a href="{% url 'buy_banner' %}" class="btn btn-dark" style="margin-top:auto;">Banner olish</a>
+                </div>
+            </div>
+            <div class="card">
+                <div style="padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;">
+                    <div class="service-icon" style="background:#d97706;"><i class="fas fa-fire"></i></div>
+                    <h3 style="font-size:16px;font-weight:700;">Top mahsulot</h3>
+                    <ul style="list-style:none;font-size:13px;color:#475569;width:100%;">
+                        <li style="padding:4px 0;display:flex;align-items:center;gap:6px;"><i class="fas fa-check" style="color:#059669;font-size:12px;"></i> TOP bo'limida</li>
+                        <li style="padding:4px 0;display:flex;align-items:center;gap:6px;"><i class="fas fa-check" style="color:#059669;font-size:12px;"></i> Maxsus "Top" belgisi</li>
+                        <li style="padding:4px 0;display:flex;align-items:center;gap:6px;"><i class="fas fa-check" style="color:#059669;font-size:12px;"></i> <strong>{{ featured_price_per_day|floatformat:0 }} so'm/kun</strong></li>
+                    </ul>
+                    <a href="{% url 'select_product_for_featured' %}" class="btn btn-dark" style="margin-top:auto;">Top qilish</a>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <i class="fas fa-crown" style="color:#0f172a;font-size:16px;"></i>
+            <span style="font-size:16px;font-weight:700;">Premium obuna narxlari</span>
+        </div>
+        <div class="card" style="margin-bottom:24px;">
+            <div class="card-body">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;">
+                    <div class="price-card">
+                        <div class="amount">{{ settings.premium_per_day_price|floatformat:0 }}</div>
+                        <div class="label">1 kun</div>
+                    </div>
+                    <div class="price-card">
+                        <div class="amount">{{ settings.premium_per_week_price|floatformat:0 }}</div>
+                        <div class="label">7 kun</div>
+                    </div>
+                    <div class="price-card popular">
+                        <div class="amount">{{ settings.premium_per_month_price|floatformat:0 }}</div>
+                        <div class="label">30 kun</div>
+                        <span class="badge">Mashhur</span>
+                    </div>
+                    <div class="price-card">
+                        <div class="amount">{{ settings.premium_per_3months_price|floatformat:0 }}</div>
+                        <div class="label">90 kun</div>
+                        <span class="badge green">{{ settings.discount_percentage }}% chegirma</span>
+                    </div>
+                    <div class="price-card">
+                        <div class="amount">{{ settings.premium_per_year_price|floatformat:0 }}</div>
+                        <div class="label">365 kun</div>
+                        <span class="badge amber">Eng tejamli</span>
+                    </div>
+                </div>
+                <a href="{% url 'buy_premium' %}" class="btn btn-outline" style="margin-top:16px;">Premium sotib olish</a>
+            </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <i class="fas fa-ad" style="color:#2563eb;font-size:16px;"></i>
+            <span style="font-size:16px;font-weight:700;">Banner narxlari</span>
+        </div>
+        <div class="card" style="margin-bottom:24px;">
+            <div class="card-body">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;">
+                    <div class="price-card">
+                        <div class="amount">{{ banner_price_per_day }}</div>
+                        <div class="label">1 kun</div>
+                    </div>
+                    <div class="price-card popular">
+                        <div class="amount">{{ banner_price_per_day_7 }}</div>
+                        <div class="label">7 kun</div>
+                        <span class="badge">Mashhur</span>
+                    </div>
+                    <div class="price-card">
+                        <div class="amount">{{ banner_price_per_day_30 }}</div>
+                        <div class="label">30 kun</div>
+                    </div>
+                </div>
+                <p style="font-size:11px;color:#94a3b8;margin-top:8px;">* Narxlar kunlik hisoblanadi. To'lov tanlangan kunlar soniga qarab amalga oshiriladi.</p>
+                <a href="{% url 'buy_banner' %}" class="btn btn-outline" style="margin-top:12px;">Banner sotib olish</a>
+            </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <i class="fas fa-fire" style="color:#d97706;font-size:16px;"></i>
+            <span style="font-size:16px;font-weight:700;">Top mahsulot narxlari</span>
+        </div>
+        <div class="card" style="margin-bottom:24px;">
+            <div class="card-body">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;">
+                    <div class="price-card">
+                        <div class="amount">{{ featured_price_per_day }}</div>
+                        <div class="label">1 kun</div>
+                    </div>
+                    <div class="price-card popular">
+                        <div class="amount">{{ featured_price_per_day_7 }}</div>
+                        <div class="label">7 kun</div>
+                        <span class="badge">Mashhur</span>
+                    </div>
+                    <div class="price-card">
+                        <div class="amount">{{ featured_price_per_day_30 }}</div>
+                        <div class="label">30 kun</div>
+                    </div>
+                </div>
+                <a href="{% url 'select_product_for_featured' %}" class="btn btn-outline" style="margin-top:12px;">Mahsulotni top qilish</a>
+            </div>
+        </div>
+
+        <div style="text-align:center;font-size:12px;color:#94a3b8;padding:16px 0;"><i class="fas fa-shield-alt"></i> Barcha xaridlar admin tomonidan tasdiqlanadi</div>
+    </div>
+</body>
+</html>

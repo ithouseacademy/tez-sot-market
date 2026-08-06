@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="uz">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Premium sotib olish - TezSot</title>
+    <link rel="icon" type="image/png" href="{% static 'img/iconlogo.png' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="apple-touch-icon" href="{% static 'img/iconlogo.png' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="TezSot">
+    <meta name="theme-color" content="#667eea">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #0f172a; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .card { background: white; border-radius: 28px; padding: 28px 24px; max-width: 520px; width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid #f0f2f5; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-size: 13px; font-weight: 500; margin-bottom: 16px; }
+        .back-link:hover { color: #2563eb; }
+        h1 { font-size: 22px; font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+        .subtitle { font-size: 13px; color: #64748b; margin-bottom: 24px; }
+        .price-hero { background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 20px; padding: 24px; text-align: center; color: white; margin-bottom: 24px; }
+        .price-hero .amount { font-size: 36px; font-weight: 800; letter-spacing: -1px; }
+        .price-hero .amount small { font-size: 14px; font-weight: 400; opacity: 0.8; }
+        .price-hero .label { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+        .section-label { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1e293b; display: flex; align-items: center; gap: 6px; }
+        .plan-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 24px; }
+        .plan-card { border: 2px solid #e2e8f0; border-radius: 16px; padding: 14px 8px; text-align: center; cursor: pointer; transition: all 0.2s; background: white; }
+        .plan-card:hover { border-color: #667eea; }
+        .plan-card.active { border-color: #667eea; background: #f5f3ff; }
+        .plan-card .days { font-size: 16px; font-weight: 700; color: #0f172a; }
+        .plan-card .price { font-size: 11px; color: #64748b; margin-top: 2px; }
+        .plan-card input { display: none; }
+        .plan-card .badge { display: inline-block; padding: 1px 6px; border-radius: 20px; font-size: 8px; font-weight: 700; margin-top: 4px; }
+        .plan-card .badge.popular { background: #667eea; color: white; }
+        .plan-card .badge.discount { background: #10b981; color: white; }
+        .plan-card .badge.best { background: #f59e0b; color: white; }
+        .field { margin-bottom: 16px; }
+        .field label { display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+        .field input, .field select { width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 14px; font-size: 14px; background: white; transition: all 0.2s; }
+        .field input:focus, .field select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+        .field input[type="file"] { padding: 10px; }
+        .field .hint { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+        .bank-info { background: #f5f3ff; border-radius: 16px; padding: 16px; margin-bottom: 20px; border: 1px solid #ede9fe; }
+        .bank-info .title { font-size: 13px; font-weight: 600; color: #4c1d95; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .bank-info .row { font-size: 12px; color: #4c1d95; padding: 4px 0; display: flex; gap: 6px; }
+        .bank-info .row strong { min-width: 60px; }
+        .btn { width: 100%; padding: 14px; border-radius: 14px; font-weight: 600; font-size: 15px; border: none; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-primary:hover { box-shadow: 0 4px 16px rgba(102,126,234,0.3); }
+        @media (max-width: 480px) {
+            .plan-grid { grid-template-columns: repeat(2, 1fr); }
+            .price-hero .amount { font-size: 28px; }
+            .card { padding: 20px 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <a href="{% url 'reklama' %}" class="back-link"><i class="fas fa-arrow-left"></i> Reklama sahifasiga</a>
+        <h1><i class="fas fa-crown" style="color:#f59e0b;"></i> Premium olish</h1>
+        <p class="subtitle">Premium obunani sotib oling va ko'proq imkoniyatlarga ega bo'ling</p>
+
+        <div class="price-hero">
+            <div class="amount" id="totalPrice">{{ settings.premium_per_month_price|floatformat:0 }} <small>so'm</small></div>
+            <div class="label" id="totalDays">30 kunlik premium</div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="section-label"><i class="fas fa-calendar-alt" style="color:#667eea;"></i> Muddatni tanlang</div>
+            <div class="plan-grid">
+                <div class="plan-card" onclick="selectPlan(this, 7, '{{ settings.premium_per_week_price|default:12000 }}', '7 kun')">
+                    <input type="radio" name="requested_days" value="7">
+                    <div class="days">7</div>
+                    <div class="price">kun</div>
+                </div>
+                <div class="plan-card active" onclick="selectPlan(this, 30, '{{ settings.premium_per_month_price|default:60000 }}', '30 kun')">
+                    <input type="radio" name="requested_days" value="30" checked>
+                    <div class="days">30</div>
+                    <div class="price">kun</div>
+                    <span class="badge popular">Mashhur</span>
+                </div>
+                <div class="plan-card" onclick="selectPlan(this, 90, '{{ settings.premium_per_3months_price|default:150000 }}', '90 kun')">
+                    <input type="radio" name="requested_days" value="90">
+                    <div class="days">90</div>
+                    <div class="price">kun</div>
+                    <span class="badge discount">-{{ settings.discount_percentage|default:10 }}%</span>
+                </div>
+                <div class="plan-card" onclick="selectPlan(this, 365, '{{ settings.premium_per_year_price|default:500000 }}', '365 kun')">
+                    <input type="radio" name="requested_days" value="365">
+                    <div class="days">365</div>
+                    <div class="price">kun</div>
+                    <span class="badge best">Eng zo'r</span>
+                </div>
+            </div>
+
+            <div class="field">
+                <label><i class="fas fa-user"></i> To'liq ismingiz</label>
+                <input type="text" name="full_name" required placeholder="Aliyev Ali" value="{{ user.first_name }} {{ user.last_name }}">
+            </div>
+
+            <div class="field">
+                <label><i class="fas fa-phone"></i> Telefon raqam</label>
+                <input type="tel" name="phone" required placeholder="998901234567">
+                <div class="hint">998XXXXXXXXX formatida kiriting</div>
+            </div>
+
+            <div class="field">
+                <label><i class="fas fa-credit-card"></i> To'lov usuli</label>
+                <select name="payment_method">
+                    {% for pm in payment_methods %}
+                    <option value="{{ pm }}">{{ pm }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {% if settings.bank_card_number %}
+            <div class="bank-info">
+                <div class="title"><i class="fas fa-university"></i> Bank karta ma'lumotlari</div>
+                <div class="row"><strong>Karta:</strong> <span>{{ settings.bank_card_number }}</span></div>
+                {% if settings.bank_name %}<div class="row"><strong>Bank:</strong> <span>{{ settings.bank_name }}</span></div>{% endif %}
+                {% if settings.bank_card_owner %}<div class="row"><strong>Egasi:</strong> <span>{{ settings.bank_card_owner }}</span></div>{% endif %}
+            </div>
+            {% endif %}
+
+            <div class="field">
+                <label><i class="fas fa-image"></i> To'lov cheki *</label>
+                <input type="file" name="payment_proof" accept="image/*" required>
+                <div class="hint">To'lovni amalga oshirgandan so'ng, chek yoki skrinshotni yuklang</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary"><i class="fas fa-crown"></i> Premium sotib olish</button>
+        </form>
+    </div>
+
+    <script>
+        function selectPlan(el, days, price, label) {
+            document.querySelectorAll('.plan-card').forEach(function(c) { c.classList.remove('active'); });
+            el.classList.add('active');
+            el.querySelector('input').checked = true;
+            document.getElementById('totalPrice').innerHTML = parseInt(price).toLocaleString() + ' <small>so\'m</small>';
+            document.getElementById('totalDays').textContent = label + 'lik premium';
+        }
+    </script>
+</body>
+</html>

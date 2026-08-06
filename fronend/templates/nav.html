@@ -1,0 +1,1380 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/tezsot.css' %}">
+<style>
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* Header */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #eef2ff;
+        }
+        
+        /* Qidiruv input */
+        .search-input {
+            width: 100%;
+            padding: 0.7rem 3rem 0.7rem 1.2rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            background: white;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+        .search-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+        }
+        
+        /* Qidiruv natijalari dropdown */
+        .search-results {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.15);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            border: 1px solid #eef2ff;
+        }
+        .search-results.active {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Natija elementi */
+        .search-result-item {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
+        .search-result-item:hover { background: #f8fafc; }
+        .search-result-item:active { background: #f1f5f9; }
+        
+        .search-result-image {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .search-result-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #0f172a;
+        }
+        .search-result-price {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #3b82f6;
+        }
+        .search-result-category {
+            font-size: 0.7rem;
+            background: #f1f5f9;
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        /* Loading spinner */
+        .loading-dots {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .loading-dots div {
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: bounce 1.2s infinite;
+        }
+        .loading-dots div:nth-child(2) { animation-delay: 0.1s; }
+        .loading-dots div:nth-child(3) { animation-delay: 0.2s; }
+        
+        @keyframes bounce {
+            0%,80%,100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Mobile Modal - TO'G'RILANGAN */
+        .mobile-search-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 9999;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            display: flex;
+            flex-direction: column;
+            visibility: hidden;
+        }
+        .mobile-search-modal.active {
+            transform: translateY(0);
+            visibility: visible;
+        }
+        .mobile-search-header {
+            padding: 1rem;
+            background: white;
+            border-bottom: 1px solid #eef2ff;
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .mobile-search-input-full {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: #f8fafc;
+        }
+        .mobile-search-input-full:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+        }
+        
+        /* Mobile Bottom Nav */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid #eef2ff;
+            padding: 0.5rem 0.75rem;
+            display: none;
+            justify-content: space-around;
+            z-index: 40;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.04);
+        }
+        .nav-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.7rem;
+            color: #64748b;
+            transition: 0.2s;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .nav-icon i {
+            font-size: 1.3rem;
+        }
+        .nav-icon:active { color: #3b82f6; transform: scale(0.95); }
+        
+        /* Suggestion tag */
+        .suggestion-tag {
+            padding: 6px 16px;
+            background: #f1f5f9;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .suggestion-tag:active {
+            background: #e2e8f0;
+            transform: scale(0.96);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .desktop-only { display: none !important; }
+            .mobile-bottom-nav { display: flex !important; }
+            .logo { max-width: 100px; height: auto; }
+        }
+        @media (min-width: 769px) {
+            .mobile-only { display: none !important; }
+        }
+        
+        .recent-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem;
+            background: #f8fafc;
+            border-radius: 14px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+        .recent-item:active { background: #f1f5f9; }
+        
+        /* Filtr panel */
+        .filter-select, .price-input {
+            padding: 0.6rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 999px;
+            width: 100%;
+        }
+        .filter-btn {
+            padding: 0.6rem 1rem;
+            border-radius: 999px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+        .filter-btn.apply { background: #3b82f6; color: white; }
+        .filter-btn.reset { background: #f1f5f9; color: #334155; }
+
+@media (max-width: 768px) {
+  .yoqbol {
+    display: none;
+  }
+}
+
+/* ===== SPLASH SCREEN (White Clean) ===== */
+#appSplash {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+#appSplash.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+.splash-logo {
+    width: 218px;
+    height: auto;
+    border-radius: 28px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    margin-bottom: 16px;
+    animation: splashLogoAnim 0.8s ease forwards;
+}
+@keyframes splashLogoAnim {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+.splash-title {
+    color: #0f172a;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+    animation: splashFadeUp 0.5s 0.2s ease forwards;
+    opacity: 0;
+}
+.splash-sub {
+    color: #94a3b8;
+    font-size: 13px;
+    margin-bottom: 28px;
+    animation: splashFadeUp 0.5s 0.35s ease forwards;
+    opacity: 0;
+}
+.splash-loader {
+    display: flex;
+    gap: 6px;
+    animation: splashFadeUp 0.5s 0.5s ease forwards;
+    opacity: 0;
+}
+.splash-loader span {
+    width: 8px;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 50%;
+    animation: splashBounce 1.2s ease-in-out infinite;
+}
+.splash-loader span:nth-child(2) { animation-delay: 0.15s; background: #cbd5e1; }
+.splash-loader span:nth-child(3) { animation-delay: 0.3s; background: #94a3b8; }
+@keyframes splashBounce {
+    0%, 80%, 100% { transform: scale(0.6); }
+    40% { transform: scale(1); }
+}
+        @keyframes splashFadeUp {
+            from { transform: translateY(16px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* ===== PAGE LOADER ===== */
+        #pageLoader {
+            position: fixed; inset: 0; z-index: 9998;
+            background: #ffffff;
+            display: none;
+            align-items: center; justify-content: center;
+            flex-direction: column;
+        }
+        #pageLoader.active { display: flex; }
+        #pageLoader .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #pageLoader p {
+            margin-top: 14px;
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* ===== PWA Install - Senior Clean ===== */
+.pwa-banner {
+    position: fixed;
+    bottom: 76px;
+    left: 16px;
+    right: 16px;
+    z-index: 100;
+    display: none;
+    animation: pwaSlideUp 0.4s ease;
+}
+@keyframes pwaSlideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.pwa-banner-inner {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+.pwa-banner-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.pwa-banner-icon img { width: 44px; height: 44px; border-radius: 12px; }
+.pwa-banner-text { flex: 1; }
+.pwa-banner-text strong { font-size: 14px; color: #0f172a; display: block; font-weight: 600; }
+.pwa-banner-text small { font-size: 12px; color: #94a3b8; display: block; }
+.pwa-banner-close {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: #f1f5f9;
+    color: #94a3b8;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+.pwa-banner-close:hover { background: #e2e8f0; }
+.pwa-banner-btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: none;
+    background: #0f172a;
+    color: white;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+}
+.pwa-banner-btn:hover { opacity: 0.85; }
+.pwa-banner-btn:active { transform: scale(0.97); }
+
+/* PWA Modal - Clean */
+.pwa-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.5);
+    z-index: 200;
+    display: none;
+    animation: pwaFadeIn 0.2s ease;
+}
+@keyframes pwaFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.pwa-modal {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    z-index: 201;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: none;
+    animation: pwaModalUp 0.35s ease;
+    padding: 0 0 24px;
+}
+@keyframes pwaModalUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.pwa-modal-header {
+    padding: 28px 20px 20px;
+    text-align: center;
+}
+.pwa-modal-header-icon { width: 56px; height: 56px; margin: 0 auto 12px; }
+.pwa-modal-header-icon img { width: 56px; height: 56px; border-radius: 14px; }
+.pwa-modal-header h2 { font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+.pwa-modal-header p { font-size: 14px; color: #64748b; }
+.pwa-modal-body { padding: 0 20px; }
+.pwa-step {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+    padding: 14px;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+.pwa-step-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+}
+.pwa-step-icon.step1 { background: #eff6ff; color: #3b82f6; }
+.pwa-step-icon.step2 { background: #f0fdf4; color: #22c55e; }
+.pwa-step-icon.step3 { background: #fefce8; color: #eab308; }
+.pwa-step-content { flex: 1; }
+.pwa-step-content strong { font-size: 14px; color: #0f172a; display: block; font-weight: 600; }
+.pwa-step-content p { font-size: 13px; color: #64748b; margin: 2px 0 0; line-height: 1.4; }
+.pwa-modal-actions { padding: 8px 20px 0; display: flex; flex-direction: column; gap: 10px; }
+.pwa-modal-install-btn {
+    width: 100%;
+    padding: 14px;
+    background: #0f172a;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.pwa-modal-install-btn:hover { opacity: 0.9; }
+.pwa-modal-install-btn:active { transform: scale(0.97); }
+.pwa-modal-close {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+.pwa-modal-close:hover { background: #f8fafc; border-color: #cbd5e1; }
+.pwa-modal-close:active { transform: scale(0.97); }
+@media (min-width: 500px) {
+    .pwa-modal { max-width: 400px; left: 50%; transform: translateX(-50%); border-radius: 20px; bottom: auto; top: 50%; transform: translate(-50%, -50%); }
+    @keyframes pwaModalUp { from { opacity: 0; transform: translate(-50%, -40%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+    .pwa-banner { max-width: 400px; left: 50%; transform: translateX(-50%); }
+    @keyframes pwaSlideUp { from { transform: translateX(-50%) translateY(100%); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+}
+    </style>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+
+    <!-- HEADER -->
+    <header class="sticky-header">
+        <div class="max-w-7xl mx-auto px-4 py-2">
+            <div class="flex items-center justify-between gap-3">
+                <a href="/" class="flex-shrink-0">
+                    <img class="logo" style="width: 110px; height: auto;" src="{% static 'img/logo-1.png' %}" alt="Tez Sot" />
+                </a>
+                
+                <!-- Desktop qidiruv -->
+                <div class="flex-1 max-w-md desktop-only">
+                    <div style="position: relative;">
+                        <input type="text" id="desktopSearch" class="search-input" placeholder="Mahsulot qidirish..." autocomplete="off" />
+                        <div class="search-icon"><i class="fas fa-search"></i></div>
+                        <div class="search-results" id="desktopSearchResults">
+                            <div id="desktopLoadingSpinner" class="loading-dots" style="display: none;"><div></div><div></div><div></div></div>
+                            <div id="desktopResultsContainer"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigatsiya -->
+                <nav class="hidden lg:flex items-center gap-5">
+                    <a href="/" class="text-gray-700 hover:text-blue-600 text-sm font-medium">Bosh sahifa</a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'my_chats' %}" class="text-gray-700 relative"><i class="fas fa-comment"></i> Chat</a>
+                        <a href="{% url 'profile_search' %}" class="text-gray-700"><i class="fas fa-search"></i> Profil</a>
+                        <a href="{% url 'view_cart' %}" class="text-gray-700 relative">Savat {% if cart_count > 0 %}<span class="absolute -top-1 -right-3 bg-green-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">{{ cart_count }}</span>{% endif %}</a>
+                        <a href="{% url 'my_purchases' %}" class="text-gray-700">Xaridlarim</a>
+                        <a href="{% url 'my_sales' %}" class="text-gray-700">Buyurtmalar</a>
+                        <a href="{% url 'my_profile' %}" class="text-gray-700">Profilim</a>
+                        <a href="{% url 'sevimlilarim' %}" class="text-gray-700 relative">Sevimli <span class="absolute -top-1 -right-3 bg-blue-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">{{ request.user.sevimli_set.count }}</span></a>
+                    {% else %}
+                        <a href="{% url 'kirish' %}" class="text-gray-700">Sevimli</a>
+                    {% endif %}
+                </nav>
+                
+                <div class="flex items-center gap-[10px] ">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'mening_elonlarim' %}" class="p-2 yoqbol    rounded-[5px] hover:bg-gray-100"><i class="ri-user-line mr-[5px] text-xl"></i><span class="ml-[10px]">mening elonlarim</span></i></a>
+                        <a href="{% url 'elon_qoshish' %}" class="p-2 yoqbol   rounded-[5px] hover:bg-gray-100"> <i class="ri-add-line text-xl"></i> elon qoshish</a>
+                    {% else %}
+                        <a href="{% url 'kirish' %}" class="p-2 yoqbol rounded-[5px] hover:bg-gray-100"><i class="ri-user-line text-xl"></i> kirish     </a>
+                        <a href="{% url 'kirish' %}" class="p-2 yoqbol  rounded-[5px] hover:bg-gray-100"><i class="ri-add-line text-xl"></i>  elon qoshish</a>
+                    {% endif %}
+                    <button id="mobileMenuBtn" class="lg:hidden  p-2 rounded-full hover:bg-gray-100"><i class="ri-menu-line text-xl"></i></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MOBILE QIDIRUV INPUT (768px ostida) -->
+    <div class="mobile-only px-4 mt-3 ">
+        <div style="position: relative;">
+            <input type="text" id="mobileSearchInput" class="search-input" placeholder="Mahsulotlar va turkumlar..." autocomplete="off" />
+            <div class="search-icon"><i class="fas fa-search"></i></div>
+            <div class="search-results" id="mobileSearchResults">
+                <div id="mobileLoadingSpinner" class="loading-dots" style="display: none;"><div></div><div></div><div></div></div>
+                <div id="mobileResultsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE FULLSCREEN SEARCH MODAL - TO'G'RILANGAN VA ISHLAYDI -->
+    <div id="mobileSearchModal" class="mobile-search-modal">
+        <div class="mobile-search-header">
+            <button id="closeMobileModal" class="p-2 rounded-full hover:bg-gray-100" style="background: none; border: none; cursor: pointer;">
+                <i class="ri-arrow-left-line text-xl"></i>
+            </button>
+            <input type="text" id="fullscreenSearchInput" class="mobile-search-input-full" placeholder="Mahsulot nomi..." autocomplete="off" />
+            <button id="voiceSearchBtn" class="p-2 rounded-full hover:bg-gray-100" style="background: none; border: none; cursor: pointer;">
+                <i class="fas fa-microphone"></i>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4" id="fullscreenResultsArea">
+            <!-- Oxirgi qidiruvlar shu yerga yuklanadi -->
+            <div id="recentSearchesArea"></div>
+            <div class="mt-4">
+                <div class="text-gray-500 text-sm font-medium mb-2">⭐ Ko'p qidirilganlar</div>
+                <div class="flex flex-wrap gap-2">
+                    <span class="suggestion-tag" data-search="iPhone">iPhone</span>
+                    <span class="suggestion-tag" data-search="Samsung">Samsung</span>
+                    <span class="suggestion-tag" data-search="MacBook">MacBook</span>
+                    <span class="suggestion-tag" data-search="Telefon">Telefon</span>
+                    <span class="suggestion-tag" data-search="Noutbuk">Noutbuk</span>
+                    <span class="suggestion-tag" data-search="Avtomobil">Avtomobil</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE MENU SIDEBAR -->
+    <div id="menuOverlay" class="fixed inset-0 bg-black/40 z-50 hidden" style="backdrop-filter: blur(2px);"></div>
+    <div id="menuPanel" class="fixed top-0 left-0 bottom-0 w-80 bg-white z-50 transform -translate-x-full transition-transform duration-300 shadow-xl rounded-r-2xl">
+        <div class="p-5 border-b flex justify-between">
+            <img src="{% static 'img/logo-1.png' %}" style="height: 32px;" />
+            <button id="closeMenuBtn" class="p-1"><i class="ri-close-line text-xl"></i></button>
+        </div>
+        <div class="p-5 space-y-4">
+            <a href="/" class="flex items-center gap-3 py-2"><i class="ri-home-line"></i><span>Bosh sahifa</span></a>
+            <a href="{% url 'reklama' %}" class="flex items-center gap-3 py-2"><i class="ri-ad-line"></i><span>Reklama</span></a>
+            
+            {% if user.is_authenticated %}
+                <a href="{% url 'my_chats' %}" class="flex items-center gap-3 py-2"><i class="ri-chat-3-line"></i><span>Chatlar</span></a>
+                <a href="{% url 'profile_search' %}" class="flex items-center gap-3 py-2"><i class="ri-search-line"></i><span>Profil qidirish</span></a>
+                <a href="{% url 'sevimlilarim' %}" class="flex items-center gap-3 py-2"><i class="ri-heart-line"></i><span>Sevimlilar</span></a>
+                <a href="{% url 'mening_elonlarim' %}" class="flex items-center gap-3 py-2"><i class="ri-user-line"></i><span>Profil</span></a>
+            {% else %}
+                <a href="{% url 'kirish' %}" class="flex items-center gap-3 py-2"><i class="ri-user-line"></i><span>Kirish</span></a>
+            {% endif %}
+            <button id="showFiltersBtn" class="w-full text-left flex items-center gap-3 py-2"><i class="ri-filter-line"></i><span>Filtrlash</span></button>
+            {% if user.is_authenticated %}
+            <a href="{% url 'settings' %}" class="flex items-center gap-3 py-2"><i class="ri-settings-line"></i><span>Sozlamalar</span></a>
+            {% endif %}
+            <a href="{% url 'boglanish' %}" class="flex items-center gap-3 py-2"><i class="ri-question-line"></i><span>Bog'lanish</span></a>
+            
+            <a href="{% url 'qoidalar' %}" class="flex items-center gap-3 py-2"><i class="ri-file-line"></i><span>Qoidalar</span></a>
+            <a href="{% url 'maxfiyliksiyosati' %}" class="flex items-center gap-3 py-2"><i class="ri-lock-line"></i><span>Maxfiylik siyosati</span></a>
+            <a href="{% url 'biz_haqimizda' %}" class="flex items-center gap-3 py-2"><i class="ri-information-line"></i><span>biz haqimizda</span></a>
+        </div>
+    </div>
+
+    <!-- FILTRLASH PANELI -->
+    <div id="filtersPanel" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-xl z-50 transform translate-y-full transition-transform duration-300">
+        <div class="p-5">
+            <div class="flex justify-between mb-4"><h3 class="font-bold text-lg">Filtrlash</h3><button id="closeFiltersBtn"><i class="ri-close-line text-xl"></i></button></div>
+            <div class="space-y-3">
+                <div><label class="text-sm font-medium">Kategoriya</label><select id="categoryFilter" class="filter-select mt-1"><option value="">Barchasi</option>{% for cat in categories %}<option value="{{ cat.id }}">{{ cat.name }}</option>{% endfor %}</select></div>
+                <div><label class="text-sm font-medium">Narx oralig'i</label><div class="flex gap-2 mt-1"><input type="number" id="minPrice" class="price-input" placeholder="Min"><input type="number" id="maxPrice" class="price-input" placeholder="Max"></div></div>
+                <div><label class="text-sm font-medium">Holati</label><select id="conditionFilter" class="filter-select mt-1"><option value="">Barchasi</option><option value="new">Yangi</option><option value="used">Ishlatilgan</option></select></div>
+            </div>
+            <div class="flex gap-3 mt-5"><button id="resetFilters" class="filter-btn reset flex-1">Tozalash</button><button id="applyFilters" class="filter-btn apply flex-1">Qo'llash</button></div>
+        </div>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION (5 ASOSIY) -->
+    <div class="mobile-bottom-nav">
+        <a href="/" class="nav-icon"><i class="ri-home-5-line"></i><span>Bosh</span></a>
+        <button id="openModalBtn" class="nav-icon"><i class="ri-search-line"></i><span>Qidiruv</span></button>
+        {% if user.is_authenticated %}<a href="{% url 'elon_qoshish' %}" class="nav-icon"><i class="ri-add-circle-line"></i><span>Qo'shish</span></a>{% else %}<a href="{% url 'kirish' %}" class="nav-icon"><i class="ri-add-circle-line"></i><span>Qo'shish</span></a>{% endif %}
+        {% if user.is_authenticated %}<a href="{% url 'sevimlilarim' %}" class="nav-icon relative"><i class="ri-heart-3-line"></i><span>Sevimli</span><span class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center">{{ request.user.sevimli_set.count }}</span></a>{% else %}<a href="{% url 'kirish' %}" class="nav-icon"><i class="ri-heart-3-line"></i><span>Sevimli</span></a>{% endif %}
+        {% if user.is_authenticated %}<a href="{% url 'view_cart' %}" class="nav-icon relative"><i class="ri-shopping-cart-line"></i><span>Savat</span>{% if cart_count > 0 %}<span class="absolute -top-1 -right-1 bg-green-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center">{{ cart_count }}</span>{% endif %}</a>{% else %}<a href="{% url 'kirish' %}" class="nav-icon"><i class="ri-shopping-cart-line"></i><span>Savat</span></a>{% endif %}
+        {% if user.is_authenticated %}<a href="{% url 'mening_elonlarim' %}" class="nav-icon"><i class="ri-user-3-line"></i><span>Profil</span></a>{% else %}<a href="{% url 'kirish' %}" class="nav-icon"><i class="ri-user-3-line"></i><span>Kirish</span></a>{% endif %}
+    </div>
+
+    <!-- ===== SPLASH SCREEN ===== -->
+    <div id="appSplash" aria-hidden="true">
+        <img src="{% static 'img/logo-1.png' %}" alt="TezSot" class="splash-logo" />
+        <div class="splash-title">TezSot</div>
+        <div class="splash-sub">Eng qulay onlayn bozor</div>
+        <div class="splash-loader">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+    <script>
+        (function() {
+            var el = document.getElementById('appSplash');
+            if (!el) return;
+            try {
+                if (sessionStorage.getItem('tezsot_splash_shown')) {
+                    el.style.display = 'none';
+                } else {
+                    sessionStorage.setItem('tezsot_splash_shown', '1');
+                    setTimeout(function() { el.style.display = 'none'; }, 600);
+                }
+            } catch(e) {}
+        })();
+    </script>
+
+    <!-- ===== PAGE LOADER ===== -->
+    <div id="pageLoader">
+        <div class="spinner"></div>
+        <p>Yuklanmoqda...</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var loader = document.getElementById('pageLoader');
+            if (loader) {
+                loader.classList.remove('active');
+                loader.style.display = 'none';
+            }
+            document.addEventListener('click', function(e) {
+                var link = e.target.closest('a');
+                if (link && link.href && link.href.indexOf(window.location.origin) === 0 && !link.hasAttribute('download') && !link.getAttribute('onclick')) {
+                    var loader = document.getElementById('pageLoader');
+                    if (loader) {
+                        loader.style.display = 'flex';
+                        loader.classList.add('active');
+                    }
+                }
+            });
+        });
+    </script>
+
+    <!-- ===== PWA INSTALL BANNER (Senior Clean) ===== -->
+    <div class="pwa-banner" id="pwaBanner">
+        <div class="pwa-banner-inner">
+            <div class="pwa-banner-icon">
+                <img src="{% static 'img/logo.png' %}" alt="TezSot" />
+            </div>
+            <div class="pwa-banner-text">
+                <strong>TezSot ilovasini o'rnatish</strong>
+                <small>Tezroq va qulayroq foydalaning</small>
+            </div>
+            <button class="pwa-banner-btn" onclick="installApp()">O'rnatish</button>
+            <button class="pwa-banner-close" onclick="dismissPwaBanner()">✕</button>
+        </div>
+    </div>
+
+    <!-- ===== PWA INSTALL MODAL (Senior Clean) ===== -->
+    <div class="pwa-overlay" id="pwaOverlay" onclick="closePwaModal()"></div>
+    <div class="pwa-modal" id="pwaModal">
+        <div class="pwa-modal-header">
+            <div class="pwa-modal-handle"></div>
+            <div class="pwa-modal-header-icon">
+                <img src="{% static 'img/logo.png' %}" alt="TezSot" />
+            </div>
+            <h2>TezSot ilovasini o'rnatish</h2>
+            <p>Ilova orqali tezroq va qulayroq foydalaning</p>
+        </div>
+
+        <div class="pwa-modal-body" id="pwaModalBody">
+            <div class="pwa-step">
+                <div class="pwa-step-icon step1"><i class="ri-menu-line"></i></div>
+                <div class="pwa-step-content">
+                    <strong id="step1Title">Brauzer menyusini oching</strong>
+                    <p id="step1Desc">Chrome brauzeringizning yuqori o'ng burchagidagi ⋮ (uch nuqta) tugmasini bosing</p>
+                </div>
+            </div>
+            <div class="pwa-step">
+                <div class="pwa-step-icon step2"><i class="ri-download-2-line"></i></div>
+                <div class="pwa-step-content">
+                    <strong id="step2Title">"Ilovani o'rnatish" ni tanlang</strong>
+                    <p id="step2Desc">"Install App" yoki "Add to Home Screen" tugmasini bosing</p>
+                </div>
+            </div>
+            <div class="pwa-step">
+                <div class="pwa-step-icon step3"><i class="ri-check-line"></i></div>
+                <div class="pwa-step-content">
+                    <strong id="step3Title">"O'rnatish" tugmasini bosing</strong>
+                    <p id="step3Desc">Ilova telefoningizga o'rnatiladi va ish stolida paydo bo'ladi</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="pwa-modal-actions">
+            <button class="pwa-modal-install-btn" onclick="installApp()"><i class="ri-download-2-line"></i> Ilovani o'rnatish</button>
+            <button class="pwa-modal-close" onclick="closePwaModal()">Keyinroq</button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== TO'LIQ QAYTA ISHLANGAN SCRIPT ====================
+        
+        // LocalStorage oxirgi qidiruvlar
+        function getRecentSearch() {
+            try {
+                return JSON.parse(localStorage.getItem('tezsot_recent') || '[]');
+            } catch(e) { return []; }
+        }
+        
+        function saveRecentSearch(query) {
+            if (!query || !query.trim()) return;
+            let arr = getRecentSearch().filter(i => i !== query);
+            arr.unshift(query.trim());
+            if (arr.length > 6) arr = arr.slice(0, 6);
+            localStorage.setItem('tezsot_recent', JSON.stringify(arr));
+            renderRecentSearches();
+        }
+        
+        function removeRecentSearch(query) {
+            let arr = getRecentSearch().filter(i => i !== query);
+            localStorage.setItem('tezsot_recent', JSON.stringify(arr));
+            renderRecentSearches();
+        }
+        
+        function renderRecentSearches() {
+            const container = document.getElementById('recentSearchesArea');
+            if (!container) return;
+            const recents = getRecentSearch();
+            if (recents.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            container.innerHTML = `
+                <div class="text-gray-500 text-sm font-medium mb-2">📜 Oxirgi qidiruvlar</div>
+                ${recents.map(r => `
+                    <div class="recent-item" data-recent="${escapeHtml(r)}">
+                        <span><i class="fas fa-history text-gray-400 mr-2"></i>${escapeHtml(r)}</span>
+                        <i class="fas fa-times text-gray-400" data-remove="${escapeHtml(r)}" style="cursor: pointer;"></i>
+                    </div>
+                `).join('')}
+            `;
+            // Qidiruvni bosganda
+            document.querySelectorAll('[data-recent]').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('fa-times')) return;
+                    const val = el.getAttribute('data-recent');
+                    if (val) window.location.href = `/barcha-mahsulotlar/?q=${encodeURIComponent(val)}`;
+                });
+            });
+            // O'chirish tugmasi
+            document.querySelectorAll('[data-remove]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const val = btn.getAttribute('data-remove');
+                    removeRecentSearch(val);
+                });
+            });
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        // API qidiruv (faqat natijalarni ko'rsatadi)
+        let searchTimeout;
+        async function performAPISearch(query, resultsContainer, loadingSpinner, resultsWrapper) {
+            if (!query || query.length < 2) {
+                if (resultsWrapper) resultsWrapper.classList.remove('active');
+                if (resultsContainer) resultsContainer.innerHTML = '';
+                return;
+            }
+            if (loadingSpinner) loadingSpinner.style.display = 'flex';
+            if (resultsContainer) resultsContainer.innerHTML = '';
+            if (resultsWrapper) resultsWrapper.classList.add('active');
+            
+            try {
+                const response = await fetch(`/api/search/?q=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error('Server xatosi');
+                const data = await response.json();
+                
+                if (!data || data.length === 0) {
+                    resultsContainer.innerHTML = `<div class="p-6 text-center text-gray-500"><i class="fas fa-box-open text-3xl mb-2"></i><p>Hech narsa topilmadi</p></div>`;
+                    return;
+                }
+                
+                resultsContainer.innerHTML = data.map(p => `
+                    <div class="search-result-item" data-url="${p.url || `/mahsulot/${p.id}/`}">
+                        <div class="search-result-image">
+                            ${p.image ? `<img src="${p.image}" alt="${escapeHtml(p.name)}">` : '<i class="fas fa-image text-gray-400 text-2xl"></i>'}
+                        </div>
+                        <div style="flex:1">
+                            <div class="search-result-name">${escapeHtml(p.name)}</div>
+                            <div class="search-result-price">💰 ${p.price || 'Narxi mavjud emas'}</div>
+                            <div class="search-result-category mt-1">${p.category || 'Kategoriya'}</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.querySelectorAll('.search-result-item').forEach(el => {
+                    el.addEventListener('click', () => {
+                        const url = el.getAttribute('data-url');
+                        if (url) window.location.href = url;
+                    });
+                });
+            } catch (error) {
+                resultsContainer.innerHTML = `<div class="p-6 text-center text-red-500"><i class="fas fa-wifi"></i><p>Ulanish xatosi</p></div>`;
+            } finally {
+                if (loadingSpinner) loadingSpinner.style.display = 'none';
+            }
+        }
+        
+        // Qidiruv inputlarini sozlash (Enter bilan to'liq sahifaga o'tadi)
+        function setupSearchInput(inputId, resultsId, spinnerId, wrapperId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            const resultsDiv = document.getElementById(resultsId);
+            const spinner = document.getElementById(spinnerId);
+            const wrapper = document.getElementById(wrapperId);
+            
+            input.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                const val = e.target.value.trim();
+                if (val.length < 2) {
+                    if (wrapper) wrapper.classList.remove('active');
+                    return;
+                }
+                searchTimeout = setTimeout(() => {
+                    performAPISearch(val, resultsDiv, spinner, wrapper);
+                }, 350);
+            });
+            
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const val = input.value.trim();
+                    if (val) {
+                        window.location.href = `/barcha-mahsulotlar/?q=${encodeURIComponent(val)}`;
+                    }
+                }
+            });
+        }
+        
+        // Modal boshqaruvi - HECH QACHON QOTIB QOLMAYDI
+        function initMobileModal() {
+            const modal = document.getElementById('mobileSearchModal');
+            const openBtn = document.getElementById('openModalBtn');
+            const closeBtn = document.getElementById('closeMobileModal');
+            const fullInput = document.getElementById('fullscreenSearchInput');
+            const fullResultsArea = document.getElementById('fullscreenResultsArea');
+            
+            if (!modal || !openBtn) return;
+            
+            // Modalni ochish
+            openBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                setTimeout(() => {
+                    if (fullInput) fullInput.focus();
+                }, 100);
+            });
+            
+            // Modalni yopish
+            const closeModal = () => {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            };
+            
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+            
+            // Orqaga tugmasi uchun (agar boshqa element bo'lsa)
+            const backBtn = modal.querySelector('.mobile-search-header button:first-child');
+            if (backBtn && backBtn !== closeBtn) {
+                backBtn.addEventListener('click', closeModal);
+            }
+            
+            // Modal ustiga bosganda yopilmasin, faqat button bilan
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+            
+            // ESC tugmasi
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+            
+            // Fullscreen qidiruv inputi
+            if (fullInput && fullResultsArea) {
+                let fullTimeout;
+                fullInput.addEventListener('input', (e) => {
+                    clearTimeout(fullTimeout);
+                    const val = e.target.value.trim();
+                    if (val.length < 2) {
+                        renderRecentSearches();
+                        return;
+                    }
+                    fullTimeout = setTimeout(async () => {
+                        fullResultsArea.innerHTML = `<div class="loading-dots"><div></div><div></div><div></div></div>`;
+                        try {
+                            const resp = await fetch(`/api/search/?q=${encodeURIComponent(val)}`);
+                            const data = await resp.json();
+                            if (!data.length) {
+                                fullResultsArea.innerHTML = `<div class="text-center p-6 text-gray-500">Topilmadi</div>`;
+                                return;
+                            }
+                            fullResultsArea.innerHTML = data.map(p => `
+                                <div class="search-result-item" data-url="${p.url || `/mahsulot/${p.id}/`}">
+                                    <div class="search-result-image">${p.image ? `<img src="${p.image}">` : '<i class="fas fa-image text-2xl text-gray-400"></i>'}</div>
+                                    <div><div class="search-result-name">${escapeHtml(p.name)}</div><div class="search-result-price">${p.price}</div></div>
+                                </div>
+                            `).join('');
+                            document.querySelectorAll('#fullscreenResultsArea .search-result-item').forEach(el => {
+                                el.addEventListener('click', () => {
+                                    window.location.href = el.getAttribute('data-url');
+                                });
+                            });
+                        } catch(e) {
+                            fullResultsArea.innerHTML = `<div class="text-center p-6 text-red-500">Xatolik</div>`;
+                        }
+                    }, 350);
+                });
+                
+                fullInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const val = fullInput.value.trim();
+                        if (val) {
+                            window.location.href = `/barcha-mahsulotlar/?q=${encodeURIComponent(val)}`;
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Mobil menyu
+        function initMobileMenu() {
+            const menuBtn = document.getElementById('mobileMenuBtn');
+            const overlay = document.getElementById('menuOverlay');
+            const panel = document.getElementById('menuPanel');
+            const closeBtn = document.getElementById('closeMenuBtn');
+            
+            if (!menuBtn || !panel) return;
+            
+            const openMenu = () => {
+                panel.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            };
+            const closeMenu = () => {
+                panel.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            };
+            
+            menuBtn.addEventListener('click', openMenu);
+            if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+            if (overlay) overlay.addEventListener('click', closeMenu);
+        }
+        
+        // Filtr paneli
+        function initFilters() {
+            const filtersPanel = document.getElementById('filtersPanel');
+            const showBtn = document.getElementById('showFiltersBtn');
+            const closeBtn = document.getElementById('closeFiltersBtn');
+            const applyBtn = document.getElementById('applyFilters');
+            const resetBtn = document.getElementById('resetFilters');
+            
+            if (!filtersPanel) return;
+            
+            const openFilters = () => {
+                filtersPanel.classList.remove('translate-y-full');
+            };
+            const closeFilters = () => {
+                filtersPanel.classList.add('translate-y-full');
+            };
+            
+            if (showBtn) showBtn.addEventListener('click', openFilters);
+            if (closeBtn) closeBtn.addEventListener('click', closeFilters);
+            if (applyBtn) applyBtn.addEventListener('click', closeFilters);
+            if (resetBtn) resetBtn.addEventListener('click', closeFilters);
+        }
+        
+        // Voice search
+        function initVoiceSearch() {
+            const voiceBtn = document.getElementById('voiceSearchBtn');
+            if (!voiceBtn) return;
+            
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.lang = 'uz-UZ';
+                recognition.interimResults = false;
+                
+                voiceBtn.addEventListener('click', () => {
+                    recognition.start();
+                    voiceBtn.style.background = '#fee2e2';
+                    voiceBtn.style.color = '#ef4444';
+                });
+                
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    const fullInput = document.getElementById('fullscreenSearchInput');
+                    if (fullInput) {
+                        fullInput.value = transcript;
+                        fullInput.dispatchEvent(new Event('input'));
+                    }
+                    voiceBtn.style.background = '';
+                    voiceBtn.style.color = '';
+                };
+                recognition.onerror = () => {
+                    voiceBtn.style.background = '';
+                    voiceBtn.style.color = '';
+                };
+                recognition.onend = () => {
+                    voiceBtn.style.background = '';
+                    voiceBtn.style.color = '';
+                };
+            } else {
+                voiceBtn.addEventListener('click', () => {
+                    alert("Ovozli qidiruv brauzeringizda qo'llab-quvvatlanmaydi");
+                });
+            }
+        }
+        
+        // ===== PWA beforeinstallprompt =====
+        var deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            deferredPrompt = e;
+            showPwaBanner();
+        });
+
+        // ===== PWA Global functions =====
+        function showPwaBanner() {
+            var b = document.getElementById('pwaBanner');
+            if (!b) return;
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+                b.style.display = 'none';
+                return;
+            }
+            if (localStorage.getItem('tezsot_pwa_dismissed') === 'true') {
+                b.style.display = 'none';
+                return;
+            }
+            b.style.display = 'block';
+        }
+
+        function updatePwaSteps(isIOS) {
+            var s1 = document.getElementById('step1Title');
+            var d1 = document.getElementById('step1Desc');
+            var s2 = document.getElementById('step2Title');
+            var d2 = document.getElementById('step2Desc');
+            var s3 = document.getElementById('step3Title');
+            var d3 = document.getElementById('step3Desc');
+            if (!s1) return;
+            if (isIOS) {
+                s1.textContent = 'Safari\'da Share tugmasini bosing';
+                d1.textContent = 'Pastki qismdagi kvadrat ichida yuqoriga strelka (↑) ko\'rinishidagi Share tugmasini bosing';
+                s2.textContent = '"Asosiy ekranga qo\'shish"ni tanlang';
+                d2.textContent = 'Pastga siljiting va "Add to Home Screen" (Asosiy ekranga qo\'shish) tugmasini bosing';
+                s3.textContent = '"Add" tugmasini bosing';
+                d3.textContent = 'Yuqori o\'ng burchakdagi "Add" (Qo\'shish) tugmasini bosing. Ilova ekranda paydo bo\'ladi';
+            } else {
+                s1.textContent = 'Brauzer menyusini oching';
+                d1.textContent = 'Chrome brauzeringizning yuqori o\'ng burchagidagi ⋮ (uch nuqta) tugmasini bosing';
+                s2.textContent = '"Ilovani o\'rnatish" ni tanlang';
+                d2.textContent = '"Install App" yoki "Add to Home Screen" tugmasini bosing';
+                s3.textContent = '"O\'rnatish" tugmasini bosing';
+                d3.textContent = 'Ilova telefoningizga o\'rnatiladi va ish stolida paydo bo\'ladi';
+            }
+        }
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(function(choice) {
+                    deferredPrompt = null;
+                    document.getElementById('pwaBanner').style.display = 'none';
+                });
+            } else {
+                var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                updatePwaSteps(isIOS);
+                var modalBtn = document.querySelector('#pwaModal .pwa-modal-install-btn');
+                if (modalBtn) {
+                    modalBtn.textContent = 'Tushundim';
+                    modalBtn.onclick = closePwaModal;
+                }
+                document.getElementById('pwaOverlay').style.display = 'block';
+                document.getElementById('pwaModal').style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function dismissPwaBanner() {
+            document.getElementById('pwaBanner').style.display = 'none';
+            localStorage.setItem('tezsot_pwa_dismissed', 'true');
+        }
+
+        function closePwaModal() {
+            document.getElementById('pwaOverlay').style.display = 'none';
+            document.getElementById('pwaModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        // ===== Buzilgan rasmlarni logo.png bilan almashtirish =====
+        document.addEventListener('error', function(e) {
+            if (e.target.tagName === 'IMG' && !e.target.src.includes('logo.png') && !e.target.src.includes('logo-1.png')) {
+                e.target.src = '/static/img/logo.png';
+            }
+        }, true);
+
+        // Sahifa yuklanganda
+        document.addEventListener('DOMContentLoaded', () => {
+            setupSearchInput('desktopSearch', 'desktopResultsContainer', 'desktopLoadingSpinner', 'desktopSearchResults');
+            setupSearchInput('mobileSearchInput', 'mobileResultsContainer', 'mobileLoadingSpinner', 'mobileSearchResults');
+            
+            renderRecentSearches();
+            initMobileModal();
+            initMobileMenu();
+            initFilters();
+            initVoiceSearch();
+            
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-input-container') && !e.target.closest('#mobileSearchInput')?.parentElement) {
+                    document.querySelectorAll('.search-results.active').forEach(el => {
+                        el.classList.remove('active');
+                    });
+                }
+            });
+
+            // ===== PWA Service Worker =====
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js', {scope: '/'}).catch(function(err) {
+                    console.warn('SW ro\'yxatdan o\'tmadi:', err);
+                });
+            }
+
+            // ===== Notification ruxsati =====
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+
+            // ===== Push obuna =====
+            async function subscribePush() {
+                if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+                if (Notification.permission !== 'granted') return;
+                try {
+                    const reg = await navigator.serviceWorker.ready;
+                    let sub = await reg.pushManager.getSubscription();
+                    if (!sub) {
+                        sub = await reg.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: 'BAb5pImx1BigYQdLual6dKfJe2bP2EVzSBX6a1PCPyb-66DmHKhm3UMuWOHqsZ0v3WxkU9FLyZG2J2q5YPHzozE'
+                        });
+                    }
+                    fetch('/api/push/subscribe/', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'X-CSRFToken': getCSRF()},
+                        body: JSON.stringify({endpoint: sub.endpoint, keys: sub.toJSON().keys})
+                    }).catch(function(){});
+                } catch(e) {
+                    console.warn('Push obuna xatosi:', e);
+                }
+            }
+
+            function getCSRF() {
+                const name = 'csrftoken';
+                const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+                return match ? match[2] : '';
+            }
+
+            if ({% if user.is_authenticated %}true{% else %}false{% endif %}) {
+                subscribePush();
+            }
+
+            // ===== PWA Install init =====
+            showPwaBanner();
+
+            window.addEventListener('appinstalled', function() {
+                deferredPrompt = null;
+                document.getElementById('pwaBanner').style.display = 'none';
+                closePwaModal();
+            });
+
+            var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            if (isIOS || isSafari) {
+                var b = document.getElementById('pwaBanner');
+                if (b && b.style.display !== 'none') {
+                    setTimeout(function() {
+                        if (!localStorage.getItem('tezsot_pwa_dismissed')) {
+                            document.getElementById('pwaOverlay').style.display = 'block';
+                            document.getElementById('pwaModal').style.display = 'block';
+                            document.body.style.overflow = 'hidden';
+                        }
+                    }, 6000);
+                }
+            }
+
+            // ===== Umumiy bildirishnomalar (barcha sahifalarda) =====
+            var prevUnread = 0;
+
+            // Xabarlar uchun
+            function pollNotifications() {
+                if (!{% if user.is_authenticated %}true{% else %}false{% endif %}) return;
+
+                fetch('/api/chat/unread/')
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        var unread = data.unread || 0;
+                        if (unread > prevUnread && prevUnread > 0) {
+                            fetch('/api/chat/unread/details/')
+                                .then(function(r2) { return r2.json(); })
+                                .then(function(detail) {
+                                    if (detail.has_unread) {
+                                        showNotif('✉️ ' + detail.sender, detail.text, '/chatlarim/');
+                                        playNotifSound();
+                                    } else {
+                                        showNotif('Yangi xabar', 'Sizga yangi xabar keldi', '/chatlarim/');
+                                        playNotifSound();
+                                    }
+                                })
+                                .catch(function() {
+                                    showNotif('Yangi xabar', 'Sizga yangi xabar keldi', '/chatlarim/');
+                                    playNotifSound();
+                                });
+                        }
+                        prevUnread = unread;
+                        updateTitle(unread);
+                    })
+                    .catch(function(){});
+            }
+
+            // Yangi mahsulotlar uchun
+            var lastProductId = parseInt(localStorage.getItem('tezsot_last_product_id') || '0', 10);
+
+            function pollNewProducts() {
+                if (!{% if user.is_authenticated %}true{% else %}false{% endif %}) return;
+
+                fetch('/api/notifications/new-products/?since_id=' + lastProductId)
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.has_new && data.products.length > 0) {
+                            var latestId = lastProductId;
+                            data.products.forEach(function(p) {
+                                if (p.id > latestId) latestId = p.id;
+                                showNotif('🛍️ TezSot Market', p.name + ' - ' + p.narx + ' so\'m', '/mahsulot/' + p.id + '/');
+                                playNotifSound();
+                            });
+                            lastProductId = latestId;
+                            localStorage.setItem('tezsot_last_product_id', String(lastProductId));
+                        }
+                    })
+                    .catch(function(){});
+            }
+
+            function updateTitle(n) {
+                var base = 'TezSot';
+                if (n > 0) { document.title = '(' + n + ') ' + base; }
+                else { document.title = base; }
+            }
+
+            function showNotif(title, body, url) {
+                if (!('Notification' in window) || Notification.permission !== 'granted') return;
+                try {
+                    var n = new Notification(title, { body: body, icon: '/static/img/iconlogo192.png', tag: 'tezsot-global' });
+                    n.onclick = function() { window.focus(); if (url) window.location.href = url; n.close(); };
+                } catch(e) {}
+            }
+
+            function playNotifSound() {
+                try {
+                    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    var osc = ctx.createOscillator();
+                    var gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.value = 800;
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.3);
+                } catch(e) {}
+            }
+
+            if ({% if user.is_authenticated %}true{% else %}false{% endif %}) {
+                setInterval(pollNotifications, 10000);
+                setTimeout(pollNotifications, 3000);
+                setInterval(pollNewProducts, 30000);
+                setTimeout(pollNewProducts, 5000);
+            }
+        });
+    </script>

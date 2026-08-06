@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="uz">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>{{ mahsulot.name }} - Tez Sot Market</title>
+    <meta name="description" content="{{ mahsulot.tavsif|default:mahsulot.name|truncatechars:160 }} - Tez Sot Market'da {{ mahsulot.narx_formatted }} so'mdan boshlab xarid qiling.">
+    <meta name="keywords" content="{{ mahsulot.name }}, {{ mahsulot.category }}, {{ mahsulot.mahsulotturi }}, tez sot, tez sot market, onlayn bozor, O'zbekiston">
+    <link rel="canonical" href="https://tezsotmarket-production.up.railway.app/mahsulot/{{ mahsulot.id }}/">
+    <meta property="og:title" content="{{ mahsulot.name }} - Tez Sot Market">
+    <meta property="og:description" content="{{ mahsulot.tavsif|default:mahsulot.name|truncatechars:160 }}">
+    {% if mahsulot.asosiyimg %}
+    <meta property="og:image" content="{{ mahsulot.asosiyimg.url }}">
+    {% endif %}
+    <meta property="og:url" content="https://tezsotmarket-production.up.railway.app/mahsulot/{{ mahsulot.id }}/">
+    <meta property="og:type" content="product">
+    <meta property="og:site_name" content="Tez Sot Market">
+    <meta property="og:locale" content="uz_UZ">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ mahsulot.name }} - Tez Sot Market">
+    <meta name="twitter:description" content="{{ mahsulot.tavsif|default:mahsulot.name|truncatechars:160 }}">
+    {% if mahsulot.asosiyimg %}
+    <meta name="twitter:image" content="{{ mahsulot.asosiyimg.url }}">
+    {% endif %}
+    {% load static %}
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="apple-touch-icon" href="{% static 'img/iconlogo192.png' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="TezSot">
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="icon" type="image/png" href="{% static 'img/iconlogo192.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/tezsot.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Container - mobil uchun qulay */
+        .container-mobile {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        @media (min-width: 1024px) {
+            .container-mobile {
+                max-width: 1280px;
+                padding: 24px 32px;
+            }
+        }
+
+        /* Premium Page - yengil premium belgilari */
+        body.premium-page .premium-accent {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        }
+        body.premium-page .premium-text {
+            color: #d97706;
+        }
+        body.premium-page .premium-border {
+            border-color: #fed7aa;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb-scroll {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #475569;
+        }
+        .breadcrumb-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .breadcrumb-scroll i, .breadcrumb-scroll span {
+            pointer-events: none;
+        }
+        .premium-badge-bread {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #78350f;
+            padding: 4px 10px;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Carousel (Mobile First / Minimal) */
+        .carousel-container {
+            background: #ffffff;
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #f0f2f5;
+        }
+        body.premium-page .carousel-container {
+            border-color: #fde68a;
+            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.08);
+        }
+        .carousel {
+            position: relative;
+        }
+        .carousel-track {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1);
+            will-change: transform;
+        }
+        .carousel-card {
+            flex: 0 0 100%;
+            aspect-ratio: 1 / 1;
+            background: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carousel-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #f8fafc;
+        }
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.96);
+            border: none;
+            border-radius: 60px;
+            backdrop-filter: blur(2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .btn-left { left: 12px; }
+        .btn-right { right: 12px; }
+        .dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            padding: 12px;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 10px;
+            background: #cbd5e1;
+            transition: all 0.2s;
+        }
+        .dot.active {
+            width: 20px;
+            background: #3b82f6;
+        }
+        body.premium-page .dot.active { background: #f59e0b; }
+
+        /* Ma'lumot kartalari */
+        .info-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #edf2f7;
+            transition: all 0.2s;
+        }
+        body.premium-page .info-card {
+            border-color: #fee2b5;
+        }
+        .info-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f2f5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #475569;
+        }
+        .info-value {
+            font-weight: 500;
+            color: #0f172a;
+            text-align: right;
+            word-break: break-word;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-new { background: #e0f2fe; color: #0369a1; }
+        .status-sold { background: #fee2e2; color: #b91c1c; }
+        .premium-tag {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #78350f;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .regular-tag {
+            background: #eff6ff;
+            color: #1e40af;
+        }
+
+        /* Narx va tugmalar */
+        .product-price {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+        body.premium-page .product-price {
+            background: linear-gradient(135deg, #fbbf24, #eab308);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        .product-title {
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin: 18px 0;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .btn-telegram { background: #2b9e4b; }
+        .btn-call { background: #e11d48; }
+        .btn-share { background: #4f46e5; }
+        body.premium-page .btn-telegram { background: #eab308; color: #422800; }
+        body.premium-page .btn-call { background: #f97316; }
+        body.premium-page .btn-share { background: #a855f7; }
+
+        /* Kontakt va sotuvchi */
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+            flex-wrap: wrap;
+        }
+        .contact-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+        .icon-phone { background: #10b981; }
+        .icon-telegram { background: #0ea5e9; }
+        .icon-email { background: #ec489a; }
+        .icon-location { background: #f97316; }
+        .contact-info {
+            flex: 1;
+            min-width: 140px;
+        }
+        .contact-info h4 {
+            font-size: 12px;
+            color: #64748b;
+        }
+        .contact-info p {
+            font-weight: 600;
+            word-break: break-word;
+            font-size: 14px;
+        }
+        .contact-link {
+            color: #3b82f6;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .seller-card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            border: 1px solid #edf2f7;
+            margin-bottom: 20px;
+            gap: 12px;
+        }
+        .seller-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 60px;
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+        .seller-info h4 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* Marketplace Cards — professional design consistent with main listing */
+        .mkt-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 8px;
+        }
+        @media (min-width: 640px) {
+            .mkt-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        }
+        @media (min-width: 1024px) {
+            .mkt-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        /* Similar products — card design matching main product cards */
+        .mkt-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #eef2ff;
+            text-decoration: none;
+            transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .mkt-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px -12px rgba(0,0,0,0.15);
+            border-color: #c7d2fe;
+        }
+        .mkt-card:active { transform: scale(0.97); }
+        .mkt-card.premium { border-top: 3px solid #fbbf24; }
+        .mkt-card.regular { border-top: 3px solid #3b82f6; }
+        .mkt-img-wrap {
+            aspect-ratio: 1 / 1;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .mkt-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
+        }
+        .mkt-card:hover .mkt-img-wrap img { transform: scale(1.08); }
+        .mkt-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            z-index: 2;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .mkt-badge-new { background: rgba(16,185,129,0.92); color: white; }
+        .mkt-badge-sold { background: rgba(239,68,68,0.92); color: white; }
+        .mkt-badge-prem {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #78350f;
+            left: auto;
+            right: 10px;
+        }
+        .mkt-heart-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.95);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            border: none;
+            backdrop-filter: blur(2px);
+            font-size: 15px;
+            color: #94a3b8;
+        }
+        .mkt-heart-btn:hover {
+            transform: scale(1.1);
+            color: #ef4444;
+        }
+        .mkt-heart-btn.active { color: #ef4444; }
+        .mkt-content {
+            padding: 12px 14px 14px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .mkt-price {
+            font-weight: 800;
+            font-size: 16px;
+            color: #2563eb;
+            margin-bottom: 3px;
+            word-break: break-word;
+            line-height: 1.3;
+        }
+        body.premium-page .mkt-price { color: #d97706; }
+        .mkt-name {
+            font-size: 13px;
+            color: #1e293b;
+            font-weight: 600;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.35;
+            margin-bottom: 6px;
+            min-height: 2.7em;
+        }
+        .mkt-category {
+            font-size: 11px;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            width: fit-content;
+            margin-bottom: 6px;
+        }
+        .mkt-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: auto;
+            padding-top: 8px;
+            border-top: 1px solid #f1f5f9;
+        }
+        .mkt-meta span { display: flex; align-items: center; gap: 4px; }
+        .mkt-img-link { display:block; text-decoration:none; color:inherit; }
+        /* Similar products actions — cart + favorite row */
+        .mkt-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px 14px;
+            border-top: 1px solid #f1f5f9;
+        }
+        .mkt-fav-btn {
+            width: 34px; height: 34px;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid #e2e8f0; border-radius: 8px;
+            background: white; color: #94a3b8; cursor: pointer;
+            font-size: 14px; transition: all .25s ease; flex-shrink: 0;
+        }
+        .mkt-fav-btn:hover { border-color: #f43f5e; color: #f43f5e; background: #fff1f2; }
+        .mkt-fav-btn.active { border-color: #f43f5e; color: #f43f5e; background: #fff1f2; }
+        .mkt-cart-btn {
+            flex: 1; height: 34px;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            border: none; border-radius: 8px;
+            background: #0f172a; color: white; cursor: pointer;
+            font-size: 12px; font-weight: 600; text-decoration: none;
+            transition: all .25s ease;
+        }
+        .mkt-cart-btn:hover { background: #1e293b; transform: translateY(-1px); }
+        .mkt-cart-btn:active { transform: scale(0.96); }
+        /* Similar section appear on scroll */
+        .similar-section { opacity: 0; transform: translateY(30px); transition: opacity .7s ease, transform .7s ease; }
+        .similar-section.visible { opacity: 1; transform: translateY(0); }
+        /* Mobile horizontal scroll carousel */
+        .similar-track {
+            display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch; padding-bottom: 12px; margin-top: 10px;
+            scroll-behavior: smooth; cursor: grab;
+        }
+        .similar-track.dragging { cursor: grabbing; scroll-snap-type: none; user-select: none; }
+        .similar-track::-webkit-scrollbar { height: 4px; }
+        .similar-track::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .similar-track::-webkit-scrollbar-track { background: transparent; }
+        .similar-track .mkt-card {
+            min-width: 220px; max-width: 220px;
+            scroll-snap-align: start; flex-shrink: 0;
+            width: 72vw;
+        }
+        @media (min-width: 640px) {
+            .similar-track { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; overflow-x: visible; padding-bottom: 0; cursor: default; }
+            .similar-track .mkt-card { min-width: 0; max-width: none; width: auto; }
+        }
+        @media (min-width: 1024px) {
+            .similar-track { grid-template-columns: repeat(4,1fr); }
+        }
+        @media (min-width: 1280px) {
+            .similar-track { grid-template-columns: repeat(5,1fr); }
+        }
+        /* Carousel scroll hint for mobile */
+        .similar-hint {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; color: #94a3b8; margin-bottom: 4px;
+        }
+        .similar-hint i { animation: hintSlide 1.5s ease-in-out infinite; }
+        @keyframes hintSlide {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(6px); }
+        }
+        @media (min-width: 640px) {
+            .similar-hint { display: none; }
+        }
+        .section-title-lg {
+            font-size: 22px;
+            font-weight: 800;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title-lg .sec-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .sec-icon-purple { background: #eef2ff; color: #6366f1; }
+        .sec-icon-orange { background: #fff7ed; color: #f97316; }
+        .sec-icon-blue { background: #eff6ff; color: #3b82f6; }
+        .sec-icon-green { background: #ecfdf5; color: #10b981; }
+        .recently-viewed { display: none; }
+        .recently-viewed.has-items { display: block; }
+
+        /* Favourite */
+        .favorite-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 60px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 16px;
+            border: none;
+            background: #f1f5f9;
+            color: #334155;
+        }
+        .fav-premium { background: #fef3c7; color: #92400e; }
+        .fav-regular { background: #eff6ff; color: #1e3a8a; }
+
+        /* Prem banner */
+        .premium-banner {
+            background: #fffbeb;
+            border-radius: 24px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .premium-banner-btn {
+            background: #fbbf24;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .description-text {
+            line-height: 1.55;
+            font-size: 14px;
+            color: #334155;
+        }
+
+        @media (max-width: 500px) {
+            .action-btn { font-size: 12px; padding: 10px 12px; }
+            .product-price { font-size: 24px; }
+            .info-row { flex-direction: column; align-items: flex-start; }
+            .info-value { text-align: left; }
+            .contact-link { margin-left: 58px; white-space: normal; }
+        }
+        .toast-container {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+            display: flex; flex-direction: column; align-items: center;
+            pointer-events: none; padding-top: 12px;
+        }
+        .toast-item {
+            pointer-events: auto;
+            max-width: 90%; min-width: 280px;
+            background: #1e293b; color: #fff;
+            padding: 12px 20px; border-radius: 12px;
+            font-size: 14px; font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 8px;
+            transform: translateY(-20px); opacity: 0;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .toast-item.show {
+            transform: translateY(0); opacity: 1;
+        }
+        .toast-item.success { background: #059669; }
+        .toast-item.warning { background: #d97706; }
+        .toast-item.error { background: #dc2626; }
+        .toast-item.info { background: #2563eb; }
+    </style>
+</head>
+
+<body class="{% if mahsulot.is_premium %}premium-page{% else %}regular-page{% endif %}">
+    {% include 'newnav.html' %}
+    {% include 'nav.html' %}
+
+    <!-- Toast messages -->
+    <div id="toastContainer" class="toast-container"></div>
+    {% if messages %}
+    <div id="djangoMessages" style="display:none">
+        {% for message in messages %}
+        <div data-tag="{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="container-mobile">
+        <!-- Breadcrumb mobil uchun scroll bilan -->
+        <div class="breadcrumb-scroll" onclick="history.back()">
+            <i class="fas fa-arrow-left text-gray-500"></i>
+            <span>Asosiy</span> <i class="fas fa-chevron-right text-xs"></i>
+            <span>{{ mahsulot.get_category_display|default:"Mahsulot" }}</span> <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-gray-700 font-medium">{{ mahsulot.name|truncatechars:35 }}</span>
+            {% if mahsulot.is_premium %}
+            <span class="premium-badge-bread"><i class="fas fa-crown text-amber-600"></i> PREMIUM</span>
+            {% endif %}
+        </div>
+
+        <!-- Asosiy grid -->
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Chap qism: rasm va tavsif -->
+            <div class="lg:w-2/3 w-full">
+                <!-- Karusel -->
+                <div class="carousel-container">
+                    <div class="carousel" id="carousel">
+                        <div class="carousel-track" id="carouselTrack">
+                            {% if mahsulot.asosiyimg %}
+                            <div class="carousel-card"><img src="{{ mahsulot.asosiyimg.url }}" alt="{{ mahsulot.name }}" loading="lazy"></div>
+                            {% endif %}
+                            {% if mahsulot.birimg %}
+                            <div class="carousel-card"><img src="{{ mahsulot.birimg.url }}" alt="{{ mahsulot.name }}" loading="lazy"></div>
+                            {% endif %}
+                            {% if mahsulot.ikkiimg %}
+                            <div class="carousel-card"><img src="{{ mahsulot.ikkiimg.url }}" alt="{{ mahsulot.name }}" loading="lazy"></div>
+                            {% endif %}
+                            {% if mahsulot.uchuimg %}
+                            <div class="carousel-card"><img src="{{ mahsulot.uchuimg.url }}" alt="{{ mahsulot.name }}" loading="lazy"></div>
+                            {% endif %}
+                            {% if not mahsulot.asosiyimg and not mahsulot.birimg and not mahsulot.ikkiimg and not mahsulot.uchuimg %}
+                            <div class="carousel-card flex flex-col"><i class="fas fa-image text-5xl text-gray-300"></i><span class="text-sm mt-2 text-gray-400">Rasm yo'q</span></div>
+                            {% endif %}
+                        </div>
+                        <button class="carousel-btn btn-left" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+                        <button class="carousel-btn btn-right" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="dots" id="dots"></div>
+                </div>
+
+                <!-- Narx va tugmalar -->
+                <div class="product-price">{{ mahsulot.narx_formatted }}</div>
+                <div class="product-title">{{ mahsulot.name }}</div>
+                <div class="text-sm text-blue-600 flex items-center gap-1 mb-3 cursor-pointer" onclick="alert('Kuzatuv qo‘shildi (demo)')">
+                    <i class="far fa-bell"></i> Narxni kuzatish
+                </div>
+
+                <div class="action-buttons">
+                    {% if user.is_authenticated and user != mahsulot.user and not mahsulot.sotilgan %}
+                    <a href="{% url 'add_to_cart' mahsulot.id %}?next=mahsulot_detail" class="action-btn" style="background:#10B981;color:white;text-decoration:none">
+                        <i class="fas fa-shopping-cart"></i> Savatga
+                    </a>
+                    {% endif %}
+                    <button class="action-btn btn-telegram" onclick="window.open('{{ mahsulot.telegram_link }}', '_blank')"><i class="fab fa-telegram"></i> Telegram</button>
+                    <button class="action-btn btn-call" onclick="window.location.href='{{ mahsulot.telefon_link }}'"><i class="fas fa-phone"></i> Qo'ng'iroq</button>
+                    <button class="action-btn btn-share" onclick="shareProduct()"><i class="fas fa-share-alt"></i> Ulashish</button>
+                </div>
+
+                <!-- Tavsif -->
+                <div class="info-card">
+                    <h3><i class="far fa-file-alt"></i> Tavsif</h3>
+                    <div class="description-text">
+                        {% if mahsulot.tavsif %}
+                            {{ mahsulot.tavsif|linebreaksbr }}
+                        {% else %}
+                            {{ mahsulot.name }} - {{ mahsulot.mahsulotturi|default:"Mahsulot" }}. {{ mahsulot.toliq_manzil }} da joylashgan.
+                            {% if mahsulot.sotilgan %} Sotilgan.{% else %} Sotuvda.{% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- O'ng qism: detallar va kontakt -->
+            <div class="lg:w-1/3 w-full">
+                <!-- Xususiyatlar -->
+                <div class="info-card">
+                    <h3><i class="fas fa-info-circle"></i> Xususiyatlar</h3>
+                    <div class="info-grid">
+                        <div class="info-row"><span class="info-label">Toifa:</span><span class="info-value">{{ mahsulot.get_category_display }}</span></div>
+                        <div class="info-row"><span class="info-label">Turi:</span><span class="info-value">{{ mahsulot.mahsulotturi }}</span></div>
+                        <div class="info-row"><span class="info-label">Holat:</span><span class="info-value"><span class="status-badge {% if mahsulot.sotilgan %}status-sold{% else %}status-new{% endif %}">{% if mahsulot.sotilgan %}🔴 Sotilgan{% else %}🟢 Yangi{% endif %}</span></span></div>
+                        <div class="info-row"><span class="info-label">Status:</span><span class="info-value">{% if mahsulot.is_premium %}<span class="premium-tag"><i class="fas fa-crown"></i> PREMIUM</span>{% else %}<span class="regular-tag"><i class="fas fa-box"></i> ODDIY</span>{% endif %}</span></div>
+                        <div class="info-row"><span class="info-label">Manzil:</span><span class="info-value">{{ mahsulot.toliq_manzil }}</span></div>
+                        <div class="info-row"><span class="info-label">Sana:</span><span class="info-value">{{ mahsulot.sana|date:"d.m.Y" }}</span></div>
+                        <div class="info-row"><span class="info-label">Ko'rishlar:</span><span class="info-value">{{ mahsulot.korishlar_soni }} marta</span></div>
+                    </div>
+                </div>
+
+                <!-- Kontakt -->
+                <div class="info-card">
+                    <h3><i class="fas fa-address-card"></i> Bog'lanish</h3>
+                    <div class="contact-item"><div class="contact-icon icon-phone"><i class="fas fa-phone-alt"></i></div><div class="contact-info"><h4>Telefon</h4><p>{{ mahsulot.telefon_formatted }}</p></div><a href="{{ mahsulot.telefon_link }}" class="contact-link">Qo'ng'iroq <i class="fas fa-arrow-right"></i></a></div>
+                    {% if mahsulot.telegram_username %}<div class="contact-item"><div class="contact-icon icon-telegram"><i class="fab fa-telegram"></i></div><div class="contact-info"><h4>Telegram</h4><p>@{{ mahsulot.telegram_username }}</p></div><a href="{{ mahsulot.telegram_link }}" target="_blank" class="contact-link">Yozish <i class="fas fa-arrow-right"></i></a></div>{% endif %}
+                    {% if mahsulot.email %}<div class="contact-item"><div class="contact-icon icon-email"><i class="fas fa-envelope"></i></div><div class="contact-info"><h4>Email</h4><p class="break-all">{{ mahsulot.email }}</p></div><a href="mailto:{{ mahsulot.email }}" class="contact-link">Yuborish <i class="fas fa-arrow-right"></i></a></div>{% endif %}
+                    <div class="contact-item"><div class="contact-icon icon-location"><i class="fas fa-map-marker-alt"></i></div><div class="contact-info"><h4>Manzil</h4><p>{{ mahsulot.toliq_manzil }}</p></div></div>
+                </div>
+
+                <!-- Sotuvchi kartasi -->
+                <a href="{% url 'user_profile' username=mahsulot.user.username %}" class="seller-card">
+                    <div class="seller-info">
+                        <h4>{{ mahsulot.user_info|default:mahsulot.user.username }}</h4>
+                        <div class="flex items-center gap-2 text-xs text-gray-500 mt-1"><i class="fas fa-boxes"></i> {{ mahsulot.user.mahsulot_set.count }} ta e'lon</div>
+                        <div class="text-xs text-gray-400 mt-1"><i class="far fa-calendar-alt"></i> {{ mahsulot.sana|timesince }} dan beri</div>
+                    </div>
+                    {% if mahsulot.user.seller_profile.profile_image %}
+                    <img src="{{ mahsulot.user.seller_profile.profile_image.url }}" class="seller-avatar object-cover" alt="avatar">
+                    {% else %}
+                    <div class="seller-avatar">{{ mahsulot.user.username|first|upper }}</div>
+                    {% endif %}
+                </a>
+
+                <!-- Tasdiqlangan -->
+                <div class="flex items-center gap-2 text-xs text-gray-500 bg-gray-50 p-3 rounded-2xl mb-4"><i class="fas fa-check-circle text-blue-500"></i> ID tasdiqlangan</div>
+
+                <!-- Sevimlilar -->
+                {% if user.is_authenticated %}
+                <form method="POST" action="{% url 'sevimliga_qoshish' mahsulot.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="favorite-btn {% if mahsulot.is_premium %}fav-premium{% else %}fav-regular{% endif %}"><i class="far fa-heart"></i> Sevimlilarga qo'shish</button>
+                </form>
+                {% if user != mahsulot.user %}
+                <a href="{% url 'start_chat' mahsulot.id mahsulot.user.id %}" class="btn btn-sm w-100 mt-2" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;padding:10px;border-radius:12px;display:block;text-align:center;font-weight:600;">
+                    <i class="fas fa-comment"></i> Sotuvchi bilan bog'lanish
+                </a>
+                {% endif %}
+                {% if has_purchased %}
+                <a href="{% url 'buy_featured' mahsulot.id %}" class="btn btn-sm w-100 mt-2" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;padding:10px;border-radius:12px;display:block;text-align:center;font-weight:600;">
+                    <i class="fas fa-fire"></i> TOP mahsulot qilish
+                </a>
+                {% endif %}
+                {% else %}
+                <button onclick="window.location.href='{% url 'kirish' %}'" class="favorite-btn {% if mahsulot.is_premium %}fav-premium{% else %}fav-regular{% endif %}"><i class="far fa-heart"></i> Sevimlilarga qo'shish</button>
+                {% endif %}
+
+                <!-- Premium banner -->
+                <div class="premium-banner">
+                    <div><i class="fas fa-crown text-amber-500 mr-1"></i> <strong>Tez Sot Premium</strong><p class="text-xs text-amber-800 mt-1">E'lonlaringizni birinchi o'ringa chiqaring</p></div>
+                    <a href="{% url 'reklama' %}"><button class="premium-banner-btn">Sotib olish</button></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- O'xshash mahsulotlar -->
+        {% if o_xshash_mahsulotlar %}
+        <div class="mt-10 similar-section" id="similarSection">
+            <div class="flex items-center justify-between mb-1 flex-wrap gap-2">
+                <div class="section-title-lg">
+                    <div class="sec-icon sec-icon-green"><i class="fas fa-magic"></i></div>
+                    O'xshash mahsulotlar
+                </div>
+                <span class="text-xs text-gray-400">{{ o_xshash_mahsulotlar|length }} ta mahsulot</span>
+            </div>
+            <div class="similar-hint"><i class="fas fa-arrow-right"></i> Gorizontal siljitish uchun barmog'ingizni suring</div>
+            <div class="similar-track" id="similarTrack">
+                {% for similar in o_xshash_mahsulotlar %}
+                <div class="mkt-card {% if similar.is_premium %}premium{% else %}regular{% endif %}">
+                    <!-- Badge -->
+                    {% if similar.is_premium %}
+                    <div class="mkt-badge mkt-badge-prem"><i class="fas fa-crown"></i> PREMIUM</div>
+                    {% endif %}
+                    <!-- Image -->
+                    <a href="{% url 'mahsulot_detail' similar.id %}" class="mkt-img-link">
+                        <div class="mkt-img-wrap">
+                            {% if similar.asosiyimg %}
+                            <img src="{{ similar.asosiyimg.url }}" alt="{{ similar.name }}" loading="lazy">
+                            {% else %}
+                            <div class="flex items-center justify-center h-full bg-gray-100 text-gray-400 w-full">
+                                <i class="fas fa-image fa-3x"></i>
+                            </div>
+                            {% endif %}
+                            {% if similar.sotilgan %}
+                            <span class="mkt-badge mkt-badge-sold"><i class="fas fa-check-circle"></i> SOTILGAN</span>
+                            {% else %}
+                            <span class="mkt-badge mkt-badge-new"><i class="fas fa-clock"></i> YANGI</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                    <!-- Heart button on image -->
+                    {% if user.is_authenticated %}
+                    <button class="mkt-heart-btn" onclick="addToFavorites(event, {{ similar.id }})" title="Sevimlilarga qo'shish">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    {% else %}
+                    <a href="{% url 'kirish' %}" class="mkt-heart-btn" title="Sevimlilarga qo'shish" onclick="event.stopPropagation();">
+                        <i class="far fa-heart"></i>
+                    </a>
+                    {% endif %}
+                    <!-- Content -->
+                    <a href="{% url 'mahsulot_detail' similar.id %}" class="mkt-content" style="text-decoration:none;color:inherit;">
+                        <div class="mkt-price">{{ similar.narx_formatted }}</div>
+                        <div class="mkt-name">{{ similar.name|truncatechars:45 }}</div>
+                        <div class="mkt-category"><i class="fas fa-tag"></i> {{ similar.mahsulotturi|default:"Mahsulot"|truncatechars:18 }}</div>
+                        <div class="mkt-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> {{ similar.get_viloyat_display|default:"Manzil" }}</span>
+                            <span><i class="fas fa-calendar-alt"></i> {{ similar.sana|date:"d.m.Y" }}</span>
+                        </div>
+                    </a>
+                    <!-- Actions -->
+                    <div class="mkt-actions">
+                        {% if user.is_authenticated %}
+                        <form method="POST" action="{% url 'sevimliga_qoshish' similar.id %}" style="margin:0;">
+                            {% csrf_token %}
+                            <button type="submit" class="mkt-fav-btn" title="Sevimlilarga qo'shish"><i class="far fa-heart"></i></button>
+                        </form>
+                        {% else %}
+                        <a href="{% url 'kirish' %}" class="mkt-fav-btn" title="Sevimlilarga qo'shish"><i class="far fa-heart"></i></a>
+                        {% endif %}
+                        {% if user.is_authenticated and user != similar.user and not similar.sotilgan %}
+                        <a href="{% url 'add_to_cart' similar.id %}?next=mahsulot_detail" class="mkt-cart-btn"><i class="fas fa-shopping-cart"></i> Savatga</a>
+                        {% else %}
+                        <a href="{% url 'mahsulot_detail' similar.id %}" class="mkt-cart-btn" style="background:#6366f1;"><i class="fas fa-eye"></i> Ko'rish</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- So'nggi ko'rilgan mahsulotlar -->
+        <div class="mt-10 recently-viewed" id="recentlyViewedSection">
+            <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+                <div class="section-title-lg">
+                    <div class="sec-icon sec-icon-blue"><i class="fas fa-history"></i></div>
+                    So'nggi ko'rilgan
+                </div>
+            </div>
+            <div class="similar-track" id="recentlyViewedGrid" style="cursor:default;"></div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const track = document.getElementById('carouselTrack');
+            const cards = Array.from(document.querySelectorAll('.carousel-card'));
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const dotsContainer = document.getElementById('dots');
+            if (!cards.length) return;
+            let current = 0;
+
+            cards.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (i === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => goTo(i));
+                dotsContainer.appendChild(dot);
+            });
+            const dots = document.querySelectorAll('.dot');
+
+            function goTo(idx) {
+                current = idx;
+                track.style.transform = `translateX(-${current * 100}%)`;
+                dots.forEach((d, i) => d.classList.toggle('active', i === current));
+            }
+            function next() { current = (current + 1) % cards.length; goTo(current); }
+            function prev() { current = (current - 1 + cards.length) % cards.length; goTo(current); }
+            nextBtn.addEventListener('click', next);
+            prevBtn.addEventListener('click', prev);
+            let autoplay = setInterval(next, 5000);
+            document.getElementById('carousel').addEventListener('mouseenter', () => clearInterval(autoplay));
+            document.getElementById('carousel').addEventListener('mouseleave', () => { autoplay = setInterval(next, 5000); });
+        });
+
+        function shareProduct() {
+            if (navigator.share) navigator.share({ title: '{{ mahsulot.name }}', text: '{{ mahsulot.narx_formatted }}', url: window.location.href }).catch(()=>{});
+            else navigator.clipboard.writeText(window.location.href).then(()=> alert('Havola nusxalandi!'));
+        }
+
+        // Recently viewed
+        (function() {
+            var currentProduct = {
+                id: {{ mahsulot.id }},
+                name: '{{ mahsulot.name|escapejs }}',
+                price: '{{ mahsulot.narx_formatted }}',
+                img: '{% if mahsulot.asosiyimg %}{{ mahsulot.asosiyimg.url }}{% endif %}',
+                url: window.location.href,
+                location: '{{ mahsulot.get_viloyat_display|escapejs|default:"" }}',
+                date: '{{ mahsulot.sana|date:"d.m" }}'
+            };
+            try {
+                var viewed = JSON.parse(localStorage.getItem('tezsot_recently_viewed') || '[]');
+                viewed = viewed.filter(function(p) { return p.id !== currentProduct.id; });
+                viewed.unshift(currentProduct);
+                if (viewed.length > 12) viewed = viewed.slice(0, 12);
+                localStorage.setItem('tezsot_recently_viewed', JSON.stringify(viewed));
+            } catch(e) {}
+
+            function renderRecentlyViewed() {
+                var section = document.getElementById('recentlyViewedSection');
+                var grid = document.getElementById('recentlyViewedGrid');
+                if (!section || !grid) return;
+                try {
+                    var items = JSON.parse(localStorage.getItem('tezsot_recently_viewed') || '[]');
+                    items = items.filter(function(p) { return p.id !== {{ mahsulot.id }}; });
+                    if (items.length === 0) return;
+                    section.classList.add('has-items');
+                    grid.className = 'similar-track';
+                    grid.style.cursor = 'default';
+                    grid.innerHTML = items.slice(0, 8).map(function(p) {
+                        return '<a href="' + p.url + '" class="mkt-card regular" style="text-decoration:none;color:inherit;">' +
+                            '<div class="mkt-img-wrap">' +
+                                (p.img ? '<img src="' + p.img + '" alt="' + p.name + '" loading="lazy">' : '<div class="flex items-center justify-center h-full bg-gray-100 text-gray-400 w-full"><i class="fas fa-image fa-3x"></i></div>') +
+                                '<span class="mkt-badge mkt-badge-new"><i class="fas fa-clock"></i> YANGI</span>' +
+                            '</div>' +
+                            '<div class="mkt-content">' +
+                                '<div class="mkt-price">' + p.price + '</div>' +
+                                '<div class="mkt-name">' + p.name + '</div>' +
+                                '<div class="mkt-meta">' +
+                                    '<span><i class="fas fa-map-marker-alt"></i> ' + (p.location || 'Manzil') + '</span>' +
+                                    '<span><i class="fas fa-calendar-alt"></i> ' + (p.date || '') + '</span>' +
+                                '</div>' +
+                            '</div>' +
+                        '</a>';
+                    }).join('');
+                } catch(e) {}
+            }
+            renderRecentlyViewed();
+        })();
+
+        // Similar section appear on scroll (when user reaches bottom)
+        (function() {
+            var section = document.getElementById('similarSection');
+            if (section && 'IntersectionObserver' in window) {
+                var obs = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(e) {
+                        if (e.isIntersecting) {
+                            e.target.classList.add('visible');
+                            obs.unobserve(e.target);
+                        }
+                    });
+                }, { threshold: 0.05, rootMargin: '0px 0px 50px 0px' });
+                obs.observe(section);
+            } else if (section) { section.classList.add('visible'); }
+        })();
+
+        // Mobile horizontal drag carousel for similar products
+        (function() {
+            var track = document.getElementById('similarTrack');
+            if (!track) return;
+            var isDown = false, startX = 0, scrollLeft = 0;
+            track.addEventListener('mousedown', function(e) {
+                if (window.innerWidth >= 640) return;
+                isDown = true;
+                track.classList.add('dragging');
+                startX = e.pageX - track.offsetLeft;
+                scrollLeft = track.scrollLeft;
+            });
+            track.addEventListener('mouseleave', function() {
+                isDown = false;
+                track.classList.remove('dragging');
+            });
+            track.addEventListener('mouseup', function() {
+                isDown = false;
+                track.classList.remove('dragging');
+            });
+            track.addEventListener('mousemove', function(e) {
+                if (!isDown) return;
+                e.preventDefault();
+                var x = e.pageX - track.offsetLeft;
+                var walk = (x - startX) * 1.5;
+                track.scrollLeft = scrollLeft - walk;
+            });
+            // Touch events
+            track.addEventListener('touchstart', function(e) {
+                if (window.innerWidth >= 640) return;
+                isDown = true;
+                track.classList.add('dragging');
+                startX = e.touches[0].pageX - track.offsetLeft;
+                scrollLeft = track.scrollLeft;
+            });
+            track.addEventListener('touchend', function() {
+                isDown = false;
+                track.classList.remove('dragging');
+            });
+            track.addEventListener('touchmove', function(e) {
+                if (!isDown) return;
+                var x = e.touches[0].pageX - track.offsetLeft;
+                var walk = (x - startX) * 1.5;
+                track.scrollLeft = scrollLeft - walk;
+            });
+        })();
+
+        // Toast messages from Django
+        (function() {
+            var container = document.getElementById('toastContainer');
+            var msgBox = document.getElementById('djangoMessages');
+            if (msgBox) {
+                var msgs = msgBox.querySelectorAll('[data-tag]');
+                msgs.forEach(function(m) {
+                    var el = document.createElement('div');
+                    el.className = 'toast-item ' + m.getAttribute('data-tag');
+                    el.innerHTML = m.textContent;
+                    container.appendChild(el);
+                    requestAnimationFrame(function() {
+                        requestAnimationFrame(function() {
+                            el.classList.add('show');
+                        });
+                    });
+                    setTimeout(function() {
+                        el.classList.remove('show');
+                        setTimeout(function() { el.remove(); }, 400);
+                    }, 3500);
+                });
+            }
+        })();
+
+        function getCookie(name) {
+            var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? decodeURIComponent(match[2]) : null;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        function showToast(message, isError) {
+            var container = document.getElementById('toastContainer');
+            if (!container) return;
+            var el = document.createElement('div');
+            el.className = 'toast-item ' + (isError ? 'error' : 'success');
+            el.innerHTML = message;
+            container.appendChild(el);
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() { el.classList.add('show'); });
+            });
+            setTimeout(function() {
+                el.classList.remove('show');
+                setTimeout(function() { el.remove(); }, 400);
+            }, 3500);
+        }
+
+        function addToFavorites(event, productId) {
+            event.stopPropagation();
+            event.preventDefault();
+            const heartBtn = event.currentTarget;
+            const icon = heartBtn.querySelector('i');
+            fetch('/api/sevimli-toggle/' + productId + '/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin'
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.status === 'added') {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    showToast('Sevimlilarga qo\'shildi');
+                } else if (data.status === 'removed') {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    showToast('Sevimlilardan olib tashlandi');
+                } else if (data.status === 'error') {
+                    showToast(data.message || 'Xatolik yuz berdi', true);
+                }
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                showToast('Xatolik yuz berdi', true);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banner sotib olish - TezSot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
+        .header a { color: #94a3b8; text-decoration: none; font-size: 20px; transition: color .2s; }
+        .header a:hover { color: #fff; }
+        .header h1 { color: #fff; font-size: 20px; font-weight: 700; }
+        .header h1 i { color: #f97316; margin-right: 8px; }
+        .container { max-width: 720px; margin: 0 auto; padding: 20px 16px 40px; }
+        .price-badge { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border-radius: 20px; padding: 24px; text-align: center; margin-bottom: 24px; box-shadow: 0 8px 24px rgba(249,115,22,0.3); }
+        .price-badge .label { font-size: 13px; font-weight: 500; opacity: .85; text-transform: uppercase; letter-spacing: 1px; }
+        .price-badge .amount { font-size: 42px; font-weight: 800; margin: 4px 0; }
+        .price-badge .unit { font-size: 14px; opacity: .75; }
+        .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+        .plan { background: #fff; border: 2px solid #e2e8f0; border-radius: 14px; padding: 16px 12px; text-align: center; cursor: pointer; transition: all .2s; position: relative; }
+        .plan:hover { border-color: #fbd38d; }
+        .plan.selected { border-color: #f97316; background: #fff7ed; }
+        .plan .days { font-size: 20px; font-weight: 700; color: #1e293b; }
+        .plan .price { font-size: 13px; color: #64748b; margin-top: 4px; }
+        .plan .badge { position: absolute; top: -8px; right: 8px; background: #f97316; color: #fff; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 8px; }
+        .card { background: #fff; border-radius: 18px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.06); margin-bottom: 16px; }
+        .card h3 { font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 16px; text-transform: uppercase; letter-spacing: .5px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; color: #475569; margin-bottom: 6px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 12px; font-size: 14px; font-family: inherit; transition: border .2s; background: #f8fafc; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,.12); background: #fff; }
+        .form-group input[type="file"] { padding: 10px; }
+        .bank-info { background: #eff6ff; border-radius: 14px; padding: 18px; margin-bottom: 16px; border: 1px solid #bfdbfe; }
+        .bank-info .title { display: flex; align-items: center; gap: 8px; font-weight: 600; color: #1e40af; font-size: 14px; margin-bottom: 10px; }
+        .bank-info .detail { font-size: 13px; color: #1e293b; padding: 3px 0; }
+        .bank-info .detail strong { display: inline-block; min-width: 60px; }
+        .btn-submit { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border: none; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700; width: 100%; cursor: pointer; transition: all .2s; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(249,115,22,.35); }
+        .btn-submit:active { transform: scale(.98); }
+        @media (max-width: 480px) { .plans { grid-template-columns: 1fr; } .container { padding: 12px 12px 80px; } .price-badge .amount { font-size: 32px; } .card { padding: 18px; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{% url 'my_profile' %}"><i class="fas fa-arrow-left"></i></a>
+        <h1><i class="fas fa-ad"></i>Banner sotib olish</h1>
+    </div>
+    <div class="container">
+        <div class="price-badge">
+            <div class="label">1 kunlik narx</div>
+            <div class="amount">{{ price_per_day|floatformat:0 }} <span style="font-size:16px;font-weight:500;">so'm</span></div>
+        </div>
+
+        <div class="plans">
+            <div class="plan" onclick="selectPlan(this, 7)">
+                <div class="days">7 kun</div>
+                <div class="price">{{ price_7_days|floatformat:0 }} so'm</div>
+            </div>
+            <div class="plan selected" onclick="selectPlan(this, 30)">
+                <div class="days">30 kun</div>
+                <div class="price">{{ price_30_days|floatformat:0 }} so'm</div>
+                <span class="badge">Ommabop</span>
+            </div>
+            <div class="plan" onclick="selectPlan(this, 90)">
+                <div class="days">90 kun</div>
+                <div class="price">{{ price_90_days|floatformat:0 }} so'm</div>
+            </div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="days" id="daysInput" value="30">
+
+            <div class="card">
+                <h3>Banner ma'lumotlari</h3>
+                <div class="form-group">
+                    <label>Sarlavha</label>
+                    <input type="text" name="title" required placeholder="Mening bannerim">
+                </div>
+                <div class="form-group">
+                    <label>Banner rasmi (1920×500)</label>
+                    <input type="file" name="image" required accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label>Havola (ixtiyoriy)</label>
+                    <input type="url" name="link" placeholder="https://">
+                </div>
+                <div class="form-group">
+                    <label>Qurilma turi</label>
+                    <select name="device_type">
+                        <option value="desktop">Desktop / Notebook</option>
+                        <option value="mobile">Mobile / Tablet</option>
+                    </select>
+                </div>
+            </div>
+
+            {% if settings.bank_card_number %}
+            <div class="bank-info">
+                <div class="title"><i class="fas fa-credit-card"></i> Bank karta ma'lumotlari</div>
+                <div class="detail"><strong>Karta:</strong> {{ settings.bank_card_number }}</div>
+                {% if settings.bank_name %}<div class="detail"><strong>Bank:</strong> {{ settings.bank_name }}</div>{% endif %}
+                {% if settings.bank_card_owner %}<div class="detail"><strong>Egasi:</strong> {{ settings.bank_card_owner }}</div>{% endif %}
+            </div>
+            {% endif %}
+
+            <div class="card">
+                <h3>To'lov cheki</h3>
+                <div class="form-group">
+                    <label>Chek rasmi (majburiy)</label>
+                    <input type="file" name="payment_proof" required accept="image/*">
+                    <small style="color:#94a3b8;font-size:12px;margin-top:6px;display:block;">To'lovni amalga oshirgandan so'ng, chek yoki skrinshotni yuklang</small>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> So'rov yuborish</button>
+        </form>
+    </div>
+
+    <script>
+        function selectPlan(el, days) {
+            document.querySelectorAll('.plan').forEach(p => p.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('daysInput').value = days;
+        }
+    </script>
+</body>
+</html>

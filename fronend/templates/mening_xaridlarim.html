@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mening xaridlarim - TezSot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/tezsot.css' %}">
+</head>
+<body>
+    {% include 'nav.html' %}
+
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1><i class="fas fa-shopping-bag"></i> Mening xaridlarim</h1>
+            </div>
+
+            {% if purchases %}
+            <div class="orders-grid">
+                {% for p in purchases %}
+                <div class="order-card">
+                    <div class="order-card-header">
+                        <span class="order-id">#{{ p.id }}</span>
+                        <span class="order-date">{{ p.created_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                    <div class="order-card-body">
+                        <div class="order-product-info">
+                            <strong>{{ p.mahsulot.name|truncatechars:50 }}</strong>
+                            <span>Miqdor: {{ p.miqdor }} ta</span>
+                            <span class="order-price">{{ p.jami_narx|floatformat:0 }} so'm</span>
+                        </div>
+                        {% if p.status == 'bekor_qilindi' and p.bekor_qilish_sababi %}
+                        <div class="order-divider"></div>
+                        <div style="padding:8px 12px;background:#fef2f2;border-radius:8px;font-size:0.85rem;color:#991b1b;">
+                            <strong>Bekor qilish sababi:</strong> {{ p.bekor_qilish_sababi }}
+                        </div>
+                        {% endif %}
+                        <div class="order-divider"></div>
+                        <div class="order-buyer">
+                            <h4><i class="fas fa-store"></i> Sotuvchi</h4>
+                            <p><strong>{{ p.sotuvchi.get_full_name|default:p.sotuvchi.username }}</strong></p>
+                        </div>
+                        <div class="order-divider"></div>
+                        <div class="order-status-row">
+                            <span class="badge {% if p.status == 'yangi' %}badge-warning{% elif p.status == 'qabul_qilindi' %}badge-info{% elif p.status == 'yuborildi' %}badge-primary{% elif p.status == 'yetkazildi' %}badge-success{% elif p.status == 'bajarildi' %}badge-success{% elif p.status == 'bekor_qilindi' %}badge-danger{% endif %}">
+                                {{ p.get_status_display }}
+                            </span>
+                            {% if p.status == 'yangi' %}
+                            <button class="btn btn-sm btn-danger" onclick="document.getElementById('cancelModal{{ p.id }}').style.display='flex'">
+                                <i class="fas fa-times"></i> Bekor qilish
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if p.status == 'yangi' %}
+                <div id="cancelModal{{ p.id }}" class="modal-overlay" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+                    <div class="modal-box">
+                        <h3>Buyurtmani bekor qilish</h3>
+                        <p style="margin:8px 0;font-size:0.9rem;color:var(--text-secondary);">#{{ p.id }} - {{ p.mahsulot.name|truncatechars:40 }}</p>
+                        <form method="post" action="{% url 'cancel_purchase' p.id %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label>Bekor qilish sababi *</label>
+                                {% if cancel_reasons %}
+                                <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+                                    {% for r in cancel_reasons %}
+                                    <label style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.9rem;">
+                                        <input type="radio" name="sabab" value="{{ r.matn }}" onchange="document.getElementById('customSabab{{ p.id }}').value='';this.closest('.modal-box').querySelector('textarea').value=this.value">
+                                        {{ r.matn }}
+                                    </label>
+                                    {% endfor %}
+                                    <label style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.9rem;">
+                                        <input type="radio" name="sabab_radio" value="" onchange="document.getElementById('customSabab{{ p.id }}').focus();document.getElementById('customSabab{{ p.id }}').value='';document.querySelector('input[name=sabab]').checked=false">
+                                        Boshqa sabab
+                                    </label>
+                                </div>
+                                {% endif %}
+                                <textarea id="customSabab{{ p.id }}" name="sabab" class="form-control" rows="2" placeholder="Sababni yozing..." oninput="document.querySelector('input[name=sabab]:checked') && (document.querySelector('input[name=sabab]:checked').checked=false);document.querySelector('input[name=sabab_radio]') && (document.querySelector('input[name=sabab_radio]').checked=true)"></textarea>
+                            </div>
+                            <div style="display:flex;gap:8px;margin-top:16px;">
+                                <button type="button" class="btn btn-outline" style="flex:1;" onclick="this.closest('.modal-overlay').style.display='none'">Bekor qilish</button>
+                                <button type="submit" class="btn btn-danger" style="flex:1;"><i class="fas fa-check"></i> Tasdiqlash</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="fas fa-shopping-bag"></i></div>
+                <h3>Hali hech narsa xarid qilmagansiz</h3>
+                <p>Mahsulotlarni ko'rib, xarid qilishni boshlang</p>
+                <a href="{% url 'barcha_mahsulotlar' %}" class="btn btn-primary">Mahsulotlarni ko'rish</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    {% include 'footer.html' %}
+
+<style>
+.modal-overlay {
+    position:fixed;inset:0;z-index:9999;
+    background:rgba(0,0,0,0.5);
+    display:flex;align-items:center;justify-content:center;
+    padding:16px;
+}
+.modal-box {
+    background:white;border-radius:var(--radius);
+    padding:24px;max-width:420px;width:100%;
+    box-shadow:var(--shadow-xl);
+}
+.modal-box h3 {font-size:1.1rem;font-weight:700;margin-bottom:4px;}
+</style>
+
+</body>
+</html>

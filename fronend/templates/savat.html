@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savat - TezSot</title>
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="apple-touch-icon" href="{% static 'img/iconlogo192.png' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="TezSot">
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="icon" type="image/png" href="{% static 'img/iconlogo192.png' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/tezsot.css' %}">
+</head>
+<body>
+    {% include 'nav.html' %}
+
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1><i class="fas fa-shopping-cart"></i> Mening savatim</h1>
+            </div>
+
+            {% if items %}
+            <div class="cart-layout">
+                <div class="cart-items">
+                    {% for item in items %}
+                    <div class="cart-card">
+                        <div class="cart-card-img">
+                            {% if item.mahsulot.asosiyimg %}
+                            <img src="{{ item.mahsulot.asosiyimg.url }}" alt="{{ item.mahsulot.name }}">
+                            {% else %}
+                            <div class="cart-card-placeholder"><i class="fas fa-image"></i></div>
+                            {% endif %}
+                        </div>
+                        <div class="cart-card-body">
+                            <a href="{% url 'mahsulot_detail' item.mahsulot.id %}" class="cart-card-title">{{ item.mahsulot.name|truncatechars:50 }}</a>
+                            <span class="cart-card-category">{{ item.mahsulot.get_category_display }}</span>
+                            <div class="cart-card-price">{{ item.narx|floatformat:0 }} so'm</div>
+                        </div>
+                        <div class="cart-card-qty">
+                            <form method="post" action="{% url 'update_cart' item.mahsulot.id %}" class="qty-form">
+                                {% csrf_token %}
+                                <div class="qty-control">
+                                    <button type="button" class="qty-btn qty-minus" onclick="this.parentNode.querySelector('input').stepDown(); this.parentNode.querySelector('input').dispatchEvent(new Event('change'))"><i class="fas fa-minus"></i></button>
+                                    <input type="number" name="miqdor" value="{{ item.miqdor }}" min="1" class="qty-input" onchange="this.form.submit()">
+                                    <button type="button" class="qty-btn qty-plus" onclick="this.parentNode.querySelector('input').stepUp(); this.parentNode.querySelector('input').dispatchEvent(new Event('change'))"><i class="fas fa-plus"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="cart-card-total">
+                            <strong>{{ item.jami|floatformat:0 }} so'm</strong>
+                        </div>
+                        <div class="cart-card-remove">
+                            <a href="{% url 'remove_from_cart' item.mahsulot.id %}" class="btn-remove" onclick="return confirm('Olib tashlashni tasdiqlaysizmi?')">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="cart-summary">
+                    <h3>Buyurtma haqida</h3>
+                    <div class="summary-row">
+                        <span>Mahsulotlar soni:</span>
+                        <span>{{ items|length }} ta</span>
+                    </div>
+                    {% for item in items %}
+                    <div class="summary-item">
+                        <span>{{ item.mahsulot.name|truncatechars:25 }} x{{ item.miqdor }}</span>
+                        <span>{{ item.jami|floatformat:0 }} so'm</span>
+                    </div>
+                    {% endfor %}
+                    <div class="summary-divider"></div>
+                    <div class="summary-row summary-total">
+                        <span>Jami:</span>
+                        <span>{{ total|floatformat:0 }} so'm</span>
+                    </div>
+                    <a href="{% url 'checkout' %}" class="btn btn-primary btn-block">
+                        <i class="fas fa-check"></i> Rasmiylashtirish
+                    </a>
+                    <a href="{% url 'barcha_mahsulotlar' %}" class="btn btn-outline btn-block" style="margin-top:8px;">
+                        <i class="fas fa-arrow-left"></i> Davom etish
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="fas fa-shopping-cart"></i></div>
+                <h3>Savatingiz bo'sh</h3>
+                <p>Mahsulotlar ko'rish va xarid qilishni boshlang</p>
+                <a href="{% url 'barcha_mahsulotlar' %}" class="btn btn-primary">Mahsulotlarni ko'rish</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    {% include 'footer.html' %}
+</body>
+</html>

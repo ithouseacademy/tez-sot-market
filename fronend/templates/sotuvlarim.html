@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sotuvlarim - TezSot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/tezsot.css' %}">
+</head>
+<body>
+    {% include 'nav.html' %}
+
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1><i class="fas fa-dollar-sign"></i> Sotuvlarim</h1>
+                <p class="page-subtitle">Mijozlaringizning buyurtmalari</p>
+            </div>
+
+            {% if purchases %}
+            <div class="orders-grid">
+                {% for p in purchases %}
+                <div class="order-card {% if p.status == 'yangi' %}order-new{% endif %}">
+                    <div class="order-card-header">
+                        <span class="order-id">#{{ p.id }}</span>
+                        <span class="order-date">{{ p.created_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                    <div class="order-card-body">
+                        <div class="order-product">
+                            <div class="order-product-info">
+                                <strong>{{ p.mahsulot.name|truncatechars:40 }}</strong>
+                                <span>Miqdor: {{ p.miqdor }} ta</span>
+                                <span class="order-price">{{ p.jami_narx|floatformat:0 }} so'm</span>
+                            </div>
+                        </div>
+                        <div class="order-divider"></div>
+                        <div class="order-buyer">
+                            <h4><i class="fas fa-user"></i> Xaridor</h4>
+                            <p><strong>{{ p.xaridor_ism }}</strong></p>
+                            <p><i class="fas fa-phone"></i> {{ p.xaridor_telefon }}</p>
+                            <p><i class="fas fa-map-marker-alt"></i> {{ p.xaridor_manzil|truncatechars:50 }}</p>
+                            {% if p.xaridor_izoh %}
+                            <p class="order-note"><i class="fas fa-comment"></i> {{ p.xaridor_izoh }}</p>
+                            {% endif %}
+                        </div>
+                        {% if p.status == 'bekor_qilindi' and p.bekor_qilish_sababi %}
+                        <div style="padding:8px 12px;background:#fef2f2;border-radius:8px;font-size:0.85rem;color:#991b1b;margin-bottom:12px;">
+                            <strong>Bekor qilish sababi:</strong> {{ p.bekor_qilish_sababi }}
+                        </div>
+                        {% endif %}
+                        <div class="order-divider"></div>
+                        <div class="order-status-row">
+                            <span class="badge {% if p.status == 'yangi' %}badge-warning{% elif p.status == 'qabul_qilindi' %}badge-info{% elif p.status == 'yuborildi' %}badge-primary{% elif p.status == 'yetkazildi' %}badge-success{% elif p.status == 'bajarildi' %}badge-success{% elif p.status == 'bekor_qilindi' %}badge-danger{% endif %}">
+                                {{ p.get_status_display }}
+                            </span>
+                            {% if p.status != 'bekor_qilindi' %}
+                            <form method="post" action="{% url 'update_purchase_status' p.id %}" class="status-form">
+                                {% csrf_token %}
+                                <select name="status" class="status-select" onchange="this.form.submit()">
+                                    {% for key, val in status_choices %}
+                                    <option value="{{ key }}" {% if key == p.status %}selected{% endif %}>{{ val }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="fas fa-dollar-sign"></i></div>
+                <h3>Hali hech qanday sotuv bo'lmagan</h3>
+                <p>Mahsulotlaringiz sotib olinsa, bu yerda ko'rinadi</p>
+                <a href="{% url 'barcha_mahsulotlar' %}" class="btn btn-primary">Mahsulotlarni ko'rish</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    {% include 'footer.html' %}
+</body>
+</html>

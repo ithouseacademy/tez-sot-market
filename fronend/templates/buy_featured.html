@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top mahsulot - TezSot</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:#ffffff; color:#0f172a; }
+        label { font-size:14px; font-weight:500; color:#334155; margin-bottom:6px; display:block; }
+        select, input[type=file] { width:100%; padding:12px 16px; border:1px solid #e2e8f0; border-radius:12px; font-size:14px; background:#fff; color:#0f172a; outline:none; transition:border .2s; }
+        select:focus, input[type=file]:focus { border-color:#0f172a; }
+    </style>
+</head>
+<body>
+    {% include 'nav.html' %}
+    <div style="max-width:480px;margin:0 auto;padding:24px 16px 80px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+            <a href="{% url 'my_profile' %}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:1px solid #e2e8f0;border-radius:10px;color:#0f172a;font-size:16px;text-decoration:none;"><i class="fas fa-arrow-left"></i></a>
+            <div>
+                <h1 style="font-size:20px;font-weight:700;">Top mahsulot</h1>
+                <p style="font-size:13px;color:#64748b;">Mahsulotingizni TOP qiling</p>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div style="margin-bottom:16px;">
+            {% for message in messages %}
+            <div style="padding:12px 16px;border-radius:12px;margin-bottom:8px;font-size:14px;{% if message.tags == 'error' %}background:#fee2e2;color:#991b1b;{% else %}background:#f0fdf4;color:#166534;{% endif %}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div style="background:#f8fafc;border-radius:16px;padding:20px;display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+            {% if mahsulot.asosiyimg %}
+            <img src="{{ mahsulot.asosiyimg.url }}" alt="" style="width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0;">
+            {% else %}
+            <div style="width:56px;height:56px;border-radius:10px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;flex-shrink:0;"><i class="fas fa-image"></i></div>
+            {% endif %}
+            <div style="flex:1;min-width:0;">
+                <div style="font-weight:600;font-size:15px;">{{ mahsulot.name }}</div>
+                <div style="font-size:13px;color:#64748b;margin-top:2px;">{{ mahsulot.narx|floatformat:0 }} so'm</div>
+            </div>
+        </div>
+
+        <div style="background:#f8fafc;border-radius:16px;padding:20px;margin-bottom:24px;">
+            <div style="font-size:13px;color:#64748b;margin-bottom:4px;">1 kunlik narx</div>
+            <div style="font-size:32px;font-weight:800;color:#0f172a;line-height:1.2;">{{ price_per_day|floatformat:0 }} <span style="font-size:16px;font-weight:500;color:#64748b;">so'm</span></div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="margin-bottom:20px;">
+                <label>Muddat</label>
+                <select name="days">
+                    <option value="7">7 kun &mdash; {{ price_7_days|floatformat:0 }} so'm</option>
+                    <option value="14">14 kun &mdash; {{ price_14_days|floatformat:0 }} so'm</option>
+                    <option value="30" selected>30 kun &mdash; {{ price_30_days|floatformat:0 }} so'm</option>
+                </select>
+            </div>
+
+            {% if settings.bank_card_number %}
+            <div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:20px;border:1px solid #e2e8f0;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                    <i class="fas fa-credit-card" style="color:#0f172a;font-size:16px;"></i>
+                    <span style="font-weight:600;font-size:14px;">Bank karta ma'lumotlari</span>
+                </div>
+                <div style="font-size:13px;color:#475569;line-height:1.8;">
+                    <div><strong>Karta:</strong> {{ settings.bank_card_number }}</div>
+                    {% if settings.bank_name %}<div><strong>Bank:</strong> {{ settings.bank_name }}</div>{% endif %}
+                    {% if settings.bank_card_owner %}<div><strong>Egasi:</strong> {{ settings.bank_card_owner }}</div>{% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div style="margin-bottom:24px;">
+                <label>To'lov cheki <span style="color:#94a3b8;font-weight:400;">(majburiy)</span></label>
+                <input type="file" name="payment_proof" required accept="image/*">
+                <p style="font-size:12px;color:#94a3b8;margin-top:6px;">To'lovni amalga oshirgandan so'ng, chek yoki skrinshotni yuklang</p>
+            </div>
+
+            <button type="submit" style="width:100%;padding:14px;background:#0f172a;color:white;border:none;border-radius:12px;font-weight:600;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+                <i class="fas fa-fire" style="color:#f59e0b;"></i> Top qilish
+            </button>
+        </form>
+    </div>
+</body>
+</html>

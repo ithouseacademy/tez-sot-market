@@ -1,0 +1,55 @@
+{% load static %}
+
+<style>
+    @media (max-width: 480px) {
+        .footer-logo { height: 36px !important; }
+    }
+</style>
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <img class="footer-logo" style="height:50px; margin-bottom:16px;" src="{% static 'img/logo-1.png' %}" alt="Tez Sot">
+                <p>Eng sifatli mahsulotlar va tez yetkazib berish xizmati.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Foydali Havolalar</h4>
+                <a href="{% url 'biz_haqimizda' %}">Biz haqimizda</a><br>
+                <a href="{% url 'qoidalar' %}">Qoidalar</a><br>
+                <a href="{% url 'maxfiyliksiyosati' %}">Maxfiylik siyosati</a><br>
+                <a href="{% url 'reklama' %}">Reklama</a>
+            </div>
+
+            <div class="footer-col">
+                <h4>Aloqa</h4>
+                {% if admin_contact %}
+                <p>{{ admin_contact.manzil }}</p>
+                <p>{{ admin_contact.telefon }}</p>
+                {% if admin_contact.telegram %}
+                <a href="{{ admin_contact.telegram }}" target="_blank">Telegram</a>
+                {% endif %}
+                {% else %}
+                <p>+998 90 123 45 67</p>
+                <p>admin@tezsot.uz</p>
+                {% endif %}
+            </div>
+
+            <div class="footer-col">
+                <h4>Ijtimoiy Tarmoqlar</h4>
+                <div style="display:flex; gap:12px; margin-top:12px;">
+                    <a href="https://t.me/tezsotmarket" target="_blank" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:white;">
+                        <i class="fab fa-telegram"></i>
+                    </a>
+                    <a href="https://www.instagram.com/tezsot.market/" target="_blank" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:white;">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Tez Sot. Barcha huquqlar himoyalangan.</p>
+        </div>
+    </div>
+</footer>

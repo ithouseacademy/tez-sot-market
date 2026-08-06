@@ -1,0 +1,41 @@
+{% load static %}
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sahifa topilmadi - Tez Sot Market</title>
+<meta name="description" content="Kechirasiz, qidirilayotgan sahifa topilmadi. Tez Sot Market bosh sahifasiga qayting.">
+<meta name="robots" content="noindex, follow">
+<link rel="icon" type="image/png" href="{% static 'img/iconlogo.png' %}">
+<style>
+  html,body{height:100%;margin:0;background:#050217;display:flex;align-items:center;justify-content:center;font-family:Inter, system-ui, sans-serif}
+  .stage{width:100vw;height:100vh;overflow:hidden;background:#050217;display:flex;align-items:center;justify-content:center}
+  .frame{width:100%;height:100dvh;position:relative;overflow:hidden;background:radial-gradient(ellipse at 10% 10%, rgba(30,40,90,0.25), transparent 10%), radial-gradient(ellipse at 90% 90%, rgba(10,20,40,0.25), transparent 10%)}
+  .center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;color:#a8d2ff;z-index:50}
+  .center h1{margin:0;font-size:64px;letter-spacing:2px;color:#89b5ff;text-shadow:0 10px 30px rgba(8,12,30,0.6)}
+  .center p{margin:10px 0 20px;color:rgba(200,220,255,0.8);font-size:14px}
+  .glow{color:#fff;text-shadow:0 0 8px #fff,0 0 12px #fff,0 0 16px #fff,0 0 20px #fff,0 0 30px #fff,0 0 40px #fff,0 0 55px #fff,0 0 75px #fff}
+  .btn-group{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+  .btn{background:rgba(168,210,255,0.1);color:#a8d2ff;border:1px solid #a8d2ff;padding:10px 20px;border-radius:10px;cursor:pointer;text-decoration:none;font-size:14px;transition:all 0.3s}
+  .btn:hover{color:#fff;text-shadow:0 0 8px #fff;box-shadow:0 0 20px rgba(168,210,255,0.3)}
+  @media (max-width:700px){.center h1{font-size:30px}}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="frame">
+      <div class="center">
+        <h1 class="glow">404</h1>
+        <h1>Sahifa topilmadi</h1>
+        <p>Siz qidirayotgan sahifa mavjud emas yoki o'chirilgan.</p>
+        <div class="btn-group">
+          <a href="/" class="btn">Bosh sahifa</a>
+          <a href="{% url 'barcha_mahsulotlar' %}" class="btn">Mahsulotlar</a>
+          <a href="{% url 'boglanish' %}" class="btn">Bog'lanish</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

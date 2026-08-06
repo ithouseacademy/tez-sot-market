@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="uz">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Bannerlarim - Tez Sot</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link rel="icon" type="image/png" href="{% static 'img/iconlogo.png' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="apple-touch-icon" href="{% static 'img/iconlogo.png' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="TezSot">
+    <meta name="theme-color" content="#667eea">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: "Inter", sans-serif; background: #f8fafc; color: #0f172a; padding-bottom: 72px; }
+        .wrapper { max-width: 900px; margin: 0 auto; padding: 20px 16px 80px; }
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+        .page-header h1 { font-size: 24px; font-weight: 800; }
+        .page-header a { text-decoration: none; color: #475569; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+        .page-header a:hover { color: #2563eb; }
+        .stats-bar { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .stat-card { flex: 1; min-width: 100px; background: white; padding: 16px; border-radius: 16px; text-align: center; border: 1px solid #f0f2f5; }
+        .stat-card h4 { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+        .stat-card .num { font-size: 22px; font-weight: 800; }
+        .stat-card .num.active { color: #10b981; }
+        .stat-card .num.pending { color: #f59e0b; }
+        .stat-card .num.expired { color: #ef4444; }
+        .banner-card { background: white; border-radius: 20px; overflow: hidden; margin-bottom: 16px; border: 1px solid #f0f2f5; transition: all 0.2s; }
+        .banner-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        .banner-img { width: 100%; height: 160px; object-fit: cover; }
+        .banner-body { padding: 16px; }
+        .banner-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .badge { padding: 2px 10px; border-radius: 30px; font-size: 10px; font-weight: 700; }
+        .badge.active { background: #d1fae5; color: #065f46; }
+        .badge.pending { background: #fef3c7; color: #92400e; }
+        .badge.expired { background: #fee2e2; color: #991b1b; }
+        .badge.cancelled { background: #f1f5f9; color: #475569; }
+        .banner-meta { font-size: 12px; color: #64748b; margin-bottom: 12px; line-height: 1.8; }
+        .banner-meta i { width: 16px; }
+        .banner-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn { padding: 8px 16px; border-radius: 40px; font-size: 12px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; border: none; cursor: pointer; }
+        .btn:active { transform: scale(0.95); }
+        .btn-extend { background: #dbeafe; color: #1e40af; }
+        .btn-extend:hover { background: #bfdbfe; }
+        .btn-reactivate { background: #d1fae5; color: #065f46; }
+        .btn-reactivate:hover { background: #a7f3d0; }
+        .btn-delete { background: #fee2e2; color: #991b1b; }
+        .btn-delete:hover { background: #fecaca; }
+        .btn-new { background: #0f172a; color: white; }
+        .btn-new:hover { background: #1e293b; }
+        .empty-state { text-align: center; padding: 60px 20px; background: white; border-radius: 28px; border: 1px solid #f0f2f5; }
+        .empty-state i { font-size: 48px; color: #94a3b8; margin-bottom: 16px; }
+        .empty-state p { color: #64748b; font-size: 14px; margin-bottom: 20px; }
+        .countdown { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .countdown.urgent { background: #fee2e2; color: #dc2626; }
+        .countdown.warning { background: #fef3c7; color: #d97706; }
+        .countdown.ok { background: #d1fae5; color: #059669; }
+        .progress-bar { width: 100%; height: 4px; background: #f1f5f9; border-radius: 4px; margin-top: 8px; }
+        .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+        @media (max-width: 768px) {
+            .banner-img { height: 120px; }
+            .stats-bar { flex-direction: row; }
+            .stat-card { padding: 12px 8px; }
+            .stat-card .num { font-size: 18px; }
+        }
+        @media (max-width: 480px) {
+            .banner-actions { flex-direction: column; }
+            .btn { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="page-header">
+            <a href="{% url 'mening_elonlarim' %}"><i class="fas fa-arrow-left"></i> Orqaga</a>
+            <h1><i class="fas fa-ad" style="color:#f59e0b;"></i> Bannerlarim</h1>
+            <a href="{% url 'buy_banner' %}"><i class="fas fa-plus-circle" style="color:#10b981;"></i> Yangi banner</a>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-card"><h4><i class="fas fa-play-circle" style="color:#10b981;"></i> Aktiv</h4><div class="num active">{{ active_count }}</div></div>
+            <div class="stat-card"><h4><i class="fas fa-clock" style="color:#f59e0b;"></i> Kutilmoqda</h4><div class="num pending">{{ pending_count }}</div></div>
+            <div class="stat-card"><h4><i class="fas fa-stop-circle" style="color:#ef4444;"></i> Tugagan</h4><div class="num expired">{{ expired_count }}</div></div>
+        </div>
+
+        {% if banners %}
+            {% for b in banners %}
+            <div class="banner-card">
+                {% if b.image %}
+                <img src="{{ b.image.url }}" alt="{{ b.title }}" class="banner-img">
+                {% endif %}
+                <div class="banner-body">
+                    <div class="banner-title">
+                        {{ b.title }}
+                        <span class="badge {{ b.status }}">
+                            {% if b.status == 'aktiv' %}Aktiv
+                            {% elif b.status == 'kutilmoqda' %}Kutilmoqda
+                            {% elif b.status == 'tugadi' %}Tugagan
+                            {% elif b.status == 'bekor_qilindi' %}Bekor qilingan
+                            {% else %}{{ b.status }}{% endif %}
+                        </span>
+                    </div>
+                    <div class="banner-meta">
+                        <i class="fas fa-calendar"></i> Yaratilgan: {{ b.created_at|date:"d.m.Y H:i" }}<br>
+                        {% if b.expires_at %}
+                            <i class="fas fa-hourglass-end"></i> Tugash: {{ b.expires_at|date:"d.m.Y H:i" }}<br>
+                        {% endif %}
+                        <i class="fas fa-clock"></i> Kun: {{ b.days }}<br>
+                        <i class="fas fa-money-bill"></i> Narx: {{ b.price }} so'm<br>
+                        {% if b.link %}
+                            <i class="fas fa-link"></i> <a href="{{ b.link }}" target="_blank">{{ b.link|truncatechars:40 }}</a><br>
+                        {% endif %}
+                        <i class="fas fa-mobile-alt"></i> Qurilma: {{ b.get_device_type_display }}<br>
+                        {% if b.status == 'aktiv' and b.get_time_remaining %}
+                            {% with rem=b.get_time_remaining %}
+                                {% if rem.days <= 1 %}
+                                    <span class="countdown urgent"><i class="fas fa-exclamation-triangle"></i> {{ b.get_time_remaining_display }} qoldi</span>
+                                {% elif rem.days <= 3 %}
+                                    <span class="countdown warning"><i class="fas fa-clock"></i> {{ b.get_time_remaining_display }} qoldi</span>
+                                {% else %}
+                                    <span class="countdown ok"><i class="fas fa-check-circle"></i> {{ b.get_time_remaining_display }} qoldi</span>
+                                {% endif %}
+                                {% with total_seconds=b.expires_at|date:"U"|add:0 %}
+                                {% endwith %}
+                                <div class="progress-bar"><div class="progress-fill" style="width:{% widthratio b.days b.days 100 %}%;background:#10b981;"></div></div>
+                            {% endwith %}
+                        {% elif b.status == 'aktiv' and b.expires_at and b.expires_at < now %}
+                            <span class="countdown urgent"><i class="fas fa-times-circle"></i> Muddati tugagan</span>
+                        {% endif %}
+                    </div>
+                    <div class="banner-actions">
+                        {% if b.status == 'aktiv' %}
+                            <a href="{% url 'extend_banner' b.id %}" class="btn btn-extend"><i class="fas fa-plus-circle"></i> Uzaytirish</a>
+                        {% elif b.status == 'tugadi' %}
+                            <a href="{% url 'reactivate_banner' b.id %}" class="btn btn-reactivate"><i class="fas fa-redo"></i> Qayta tiklash</a>
+                        {% endif %}
+                        <form method="POST" action="{% url 'delete_banner' b.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-delete" onclick="return confirm('Haqiqatan ham "{{ b.title }}" bannerni o\'chirmoqchimisiz?')"><i class="fas fa-trash"></i> O'chirish</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-ad"></i>
+                <p>Hozircha bannerlaringiz yo'q.<br>Birinchi banneringizni qo'shing va mahsulotlaringizni targ'ib qiling!</p>
+                <a href="{% url 'buy_banner' %}" class="btn btn-new"><i class="fas fa-plus"></i> Banner sotib olish</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function pollBannerExpiry() {
+                fetch('/api/banner/check-expiry/')
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.notifications && data.notifications.length > 0) {
+                            data.notifications.forEach(function(n) {
+                                if ('Notification' in window && Notification.permission === 'granted') {
+                                    try {
+                                        var notif = new Notification('📢 Banner: ' + n.banner_title, {
+                                            body: n.message,
+                                            icon: '/static/img/iconlogo.png',
+                                        });
+                                        notif.onclick = function() {
+                                            window.focus();
+                                            window.location.href = '/mening-bannerlarim/';
+                                            notif.close();
+                                        };
+                                    } catch(e) {}
+                                }
+                                if (n.type === '2_kun' || n.type === '1_kun' || n.type === '1_soat') {
+                                    try {
+                                        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+                                        var osc = ctx.createOscillator();
+                                        var gain = ctx.createGain();
+                                        osc.connect(gain);
+                                        gain.connect(ctx.destination);
+                                        osc.frequency.value = 600;
+                                        osc.type = 'triangle';
+                                        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                                        osc.start(ctx.currentTime);
+                                        osc.stop(ctx.currentTime + 0.3);
+                                    } catch(e) {}
+                                }
+                            });
+                        }
+                        if (data.expired_ids && data.expired_ids.length > 0) {
+                            location.reload();
+                        }
+                    })
+                    .catch(function(){});
+            }
+            setInterval(pollBannerExpiry, 15000);
+            setTimeout(pollBannerExpiry, 2000);
+        });
+    </script>
+</body>
+</html>

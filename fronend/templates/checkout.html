@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyurtma rasmiylashtirish - TezSot</title>
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="apple-touch-icon" href="{% static 'img/iconlogo192.png' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="TezSot">
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="icon" type="image/png" href="{% static 'img/iconlogo192.png' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/tezsot.css' %}">
+</head>
+<body>
+    {% include 'nav.html' %}
+
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1><i class="fas fa-file-invoice"></i> Buyurtma rasmiylashtirish</h1>
+            </div>
+
+            <div class="cart-layout">
+                <div>
+                    <div class="card" style="padding: 24px;">
+                        <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:20px;">Yetkazib berish ma'lumotlari</h3>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label>Ismingiz *</label>
+                                <input type="text" name="ism" class="form-control" placeholder="To'liq ismingiz" value="{{ ism|default:'' }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Telefon raqam *</label>
+                                <input type="text" name="telefon" class="form-control" placeholder="998901234567" value="{{ telefon|default:'' }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Yetkazib berish manzili *</label>
+                                <textarea name="manzil" class="form-control" rows="3" placeholder="Viloyat, tuman, ko'cha, uy raqami" required>{{ manzil|default:'' }}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Izoh (ixtiyoriy)</label>
+                                <textarea name="izoh" class="form-control" rows="2" placeholder="Qo'shimcha ma'lumot">{{ izoh|default:'' }}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-block btn-lg" style="margin-top:8px;">
+                                <i class="fas fa-check-circle"></i> Buyurtmani tasdiqlash
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="cart-summary" style="position:sticky; top:88px;">
+                        <h3><i class="fas fa-shopping-cart"></i> Buyurtma qilinadiganlar</h3>
+                        <div style="margin-top:16px;">
+                            {% for item in items %}
+                            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);">
+                                <div>
+                                    <a href="{% url 'mahsulot_detail' item.mahsulot.id %}" style="font-weight:600; font-size:0.9rem;">{{ item.mahsulot.name|truncatechars:30 }}</a>
+                                    <div style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">{{ item.miqdor }} ta x {{ item.mahsulot.narx_formatted }}</div>
+                                </div>
+                                <strong style="color:var(--primary);">{{ item.jami|floatformat:0 }} so'm</strong>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-total" style="display:flex; justify-content:space-between;">
+                            <span>Jami:</span>
+                            <span>{{ total|floatformat:0 }} so'm</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    {% include 'footer.html' %}
+</body>
+</html>
