@@ -19,7 +19,7 @@ def robots_txt(request):
         "Allow: /",
         "Disallow: /admin/",
         "Disallow: /auth/",
-        "Sitemap: https://tezsotmarket-production.up.railway.app/sitemap.xml",
+        "Sitemap: https://tezsotmarket.ithouse.academy/sitemap.xml",
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")
 
@@ -45,7 +45,7 @@ def sitemap_xml(request):
         ("premium-mahsulotlar/", "0.7", "daily"),
     ]
     
-    base_url = "https://tezsotmarket-production.up.railway.app"
+    base_url = "https://tezsotmarket.ithouse.academy"
     
     for path, priority, changefreq in static_pages:
         urls.append(f"""

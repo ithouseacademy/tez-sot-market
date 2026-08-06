@@ -28,9 +28,17 @@ if not SECRET_KEY:
         SECRET_KEY = secrets.token_urlsafe(50)
         print('WARNING: DJANGO_SECRET_KEY not set. Using a random key (sessions will reset on restart). Set it in Railway variables!', file=sys.stderr)
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'tezsotmarket-production.up.railway.app,.railway.app,localhost').split(',')
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'tezsotmarket-production.up.railway.app,tezsotmarket.ithouse.academy,.railway.app,localhost').split(',')
+
+# Custom domenlar har doim ruxsat etilgan bo'lsin (env var o'rnatilgan bo'lsa ham)
+for host in ['tezsotmarket.ithouse.academy', 'ithouse.academy']:
+    if host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(host)
 
 CSRF_TRUSTED_ORIGINS = os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', 'https://tezsotmarket-production.up.railway.app').split(',')
+for origin in ['https://tezsotmarket.ithouse.academy']:
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
