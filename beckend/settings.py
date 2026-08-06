@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 import dj_database_url
 
@@ -20,7 +21,7 @@ DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 if not SECRET_KEY:
-    if DEBUG:
+    if DEBUG or 'collectstatic' in sys.argv:
         SECRET_KEY = 'dev-secret-key-do-not-use-in-production'
     else:
         raise RuntimeError("DJANGO_SECRET_KEY environment variable is required!")
